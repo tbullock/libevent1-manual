@@ -48,4 +48,14 @@ _event_base_ instance.
 
 ### Where do I start?
 
-The library entry point is *event_init* or *event_base_new*
+Programs using libevent need to link to the *-levent* library and include the
+*event.h* header to access the API. The library entry point is *event_init* or
+*event_base_new* for programs intending to run multiple event loops. Events
+can be configured using *event_set* and then scheduled for execution with
+*event_add*.  You can start executing your event_loop with *event_dispatch*
+and you can exit from the event loop by calling *event_loopexit*.
+
+### Ok so how do I use this library?
+
+That's what this manual is here to answer. Todo is colour by numbers all of
+the various man pages and write out some further documentation.
