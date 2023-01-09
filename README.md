@@ -12,23 +12,16 @@ OpenBSD has not, nor plans to migrate to the newer library version.
 
 Internally OpenBSD bundled programs rely on libevent including:
 
-| Left columns  | Right columns |
-| ------------- |:-------------:|
-| ldap          | httpd         |
-| snmpd         | identd        |
-| dhcpleased    | ifstated      |
-| iked          | inetd         |
-| resolvd       | iscsid        |
-| slaacd        | lpd           |
-| unwind        | npppd         |
-| cu            | nsd           |
-| tmux          | ospf6d        |
+| ldap          | httpd         | relayd        |
+| snmpd         | identd        | vmd           |
+| dhcpleased    | ifstated      | ripd          |
+| iked          | inetd         | unbound       |
+| resolvd       | iscsid        | traceroute    |
+| slaacd        | lpd           | hostapd       |
+| unwind        | npppd         | ftp-proxy     |
+| cu            | nsd           | radiusd       |
+| tmux          | ospf6d        | eigrpd        |
 | dvmrpd        | rad           |
-| eigrpd        | radiusd       |
-| ftp-proxy     | relayd        |
-| hostapd       | ripd          |
-| traceroute    | unbound       |
-| vmd           |               |
 
 Clearly with such robust usage, the library is core and important to the
 operating system. This manual attempts to improve documentation for libevent.
@@ -53,4 +46,4 @@ _event_base_ instance.
 
 ### Where do I start?
 
-The library entry point is event_init or event_base_new
+The library entry point is *event_init* or *event_base_new*
