@@ -12,6 +12,8 @@ OpenBSD has not, nor plans to migrate to the newer library version.
 
 Internally OpenBSD bundled programs rely on libevent including:
 
+|               |               |              |
+|---------------|---------------|---------------|
 | ldap          | httpd         | relayd        |
 | snmpd         | identd        | vmd           |
 | dhcpleased    | ifstated      | ripd          |
@@ -21,7 +23,7 @@ Internally OpenBSD bundled programs rely on libevent including:
 | unwind        | npppd         | ftp-proxy     |
 | cu            | nsd           | radiusd       |
 | tmux          | ospf6d        | eigrpd        |
-| dvmrpd        | rad           |
+| dvmrpd        | rad           |               |
 
 Clearly with such robust usage, the library is core and important to the
 operating system. This manual attempts to improve documentation for libevent.
