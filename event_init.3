@@ -1,3 +1,4 @@
+.\" $OpenBSD$
 .\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
 .\"
 .\" Permission to use, copy, modify, and distribute this software for any
@@ -12,141 +13,242 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: January 9 2023 $
-.Dt EVENT_INIT 3
+.Dd $Mdocdate: January 21 2023 $
+.Dt EVENT_BASE_NEW 3
 .Os
 .Sh NAME
 .Nm event_base_new ,
-.Nm event_init
-.Nd initializes an
-.Vt event_base
-instance
+.Nm event_init ,
+.Nm event_base_free
+.Nd event_base structure allocation and deallocation
 .Sh SYNOPSIS
 .In event.h
 .Ft "struct event_base *"
 .Fn event_base_new void
 .Ft "struct event_base *"
 .Fn event_init void
+.Ft void
+.Fn event_base_free "struct event_base *base"
 .Sh DESCRIPTION
 The functions
 .Fn event_base_new
 and
 .Fn event_init
-initialize the
-.Lb libevent
-and need to be called prior to scheduling an event or
-starting the event-loop. The two functions are similar, although global
-variables are set when calling
-.Fn event_init
-to help simplify the API for programs requiring only one event-loop.
+allocate memory and initialize an opaque
+.Vt event_base
+structure that is used to schedule and monitor events in an event loop using
+the operating system's most efficient or stable kernel notification method.
 .Pp
-The
-.Lb libevent
-API is generally not thread-safe unless only one
-.Vt "event_base"
-instance is accessible per thread or care is taken to lock access.
-.Pp
-These functions allocate memory that should be freed using
-.Xr event_base_free 3 .
-.Pp
-Diagnostic and error messages are retrievable from these functions by
-configuring a message log callback with
-.Xr event_set_log_callback 3 .
-.Pp
-After a call to
-.Xr fork 2
-some notification methods will not persist and need to reinitiliazed with
-.Xr event_reinit 3 .
-.Sh RETURN VALUES
-The
-.Fn event_base_new
+Kernel notification methods are ways for a program to be notified of
+events that occur in the operating system's kernel.
+Examples of such events include changes to file descriptors, file I/O
+operations or network activity.
+There are different ways for applications to be notified of these events,
+such as through the use of system calls like
+.Xr kqueue 2 ,
+.Xr poll 2 ,
 and
-.Fn event_init
-functions return a
-.Vt "struct event_base"
-pointer.
-If the functions fail, for example, due to a lack of memory, they do
-.Em NOT
+.Xr select 2 ;
+on
+.Ox
+this defaults to
+.Xr kqueue 2 .
+These methods are used by the event library to efficiently monitor events and
+notify programs when they occur.
+After a call to
+.Xr fork 2 ,
+notification mechanisms will need to be reinitialized with
+.Xr event_reinit 3 .
+.Pp
+To report errors, warnings and diagnostics from
+.Fn event_base_new
+configure the log callback mechanism with
+.Xr event_set_log_callback 3 .
+If an error occurs the function will report the error and then call
+.Xr exit 3
+with a value of 1.
+On error, this function does
+.Em not
 return.
-.Sh ENVIRONMENT
-Programs using the
-.Lb libevent
-are configurable with environment variables prior to calling
+.Pp
+Modify the behavior of
+.Fn event_base_new
+by using environment variables to disable library support for certain kernel
+notification methods and to enable additional diagnostic reporting.
+For a complete list of environment variables refer to
+.Sx ENVIRONMENT .
+.Pp
+The function
+.Fn event_init
+is a wrapper of
+.Fn event_base_new
+and sets internal global variables.
+This function simplifies the API for programs using only one event loop,
+otherwise, the two functions are equivalent.
+.Pp
+The
+.Fn event_base_free
+function releases all resources associated with an
+.Vt event_base
+structure and is intended to be called after the event loop has been stopped.
+If
+.Fa base
+is not
+.Dv NULL
+it must be a pointer returned by an earlier call to
 .Fn event_base_new
 or
 .Fn event_init .
-.Bl -tag
-.It Ev Sy EVENT_SHOW_METHOD
+If
+.Fa base
+is
+.Dv NULL
+and the simplified API was not initialized with
+.Fn event_init ,
+then
+.Fn event_base_free
+will call
+.Xr assert 3 .
+.Sh RETURN VALUES
+.Fn event_base_new
+and
+.Fn event_init
+return the newly allocated
+.Vt event_base
+structure.
+.Sh ENVIRONMENT
+Environment variables that modify the behavior of
+.Fn event_base_new
+and
+.Fn event_init
+are:
+.Bl -tag -width Ds
+.It Ev EVENT_SHOW_METHOD
 If the log callback is configured, report which kernel notification method the
 library is using.
-.It Ev Sy EVENT_NOKQUEUE
+.It Ev EVENT_NOKQUEUE
 Disable library support for
-.Xr kqueue 2
-.It Ev Sy EVENT_NOPOLL
+.Xr kqueue 2 .
+.It Ev EVENT_NOPOLL
 Disable library support for
-.Xr poll 2
-.It Ev Sy EVENT_NOSELECT
+.Xr poll 2 .
+.It Ev EVENT_NOSELECT
 Disable library support for
-.Xr select 2
+.Xr select 2 .
 .El
-.Sh EXAMPLES
-In this example code a new
-.Vt "struct event_base"
-is initialized with support for logging.
-This example also applies to
-.Fn event_base_new ,
-the difference being that internal global variables are configured to simplify
-other parts of the API.
-.Bd -literal -offset indent
-#include <stdio.h>
-#include <event.h>
-
-void cb(int sev, const char* msg)
-{
-	printf("%d: %s\n", sev, msg);
-}
-
-int main()
-{
-	event_set_log_callback(cb);
-
-	struct event_base *base = event_init();
-	if (base == NULL) {
-		printf("event_init failed, will not return\\n");
-		return 1;
-	}
-	/* do something with the event library here */
-
-	event_base_free(base);
-	return 0;
-}
-.Ed
+.Pp
+These environment variables will work unless library detects the program was
+executed as either setuid or setgid using
+.Xr issetugid 2 .
+The value of the environment variables is ignored, even if their value is
+empty or zero.
+.Sh DIAGNOSTICS
+The event library relies on its own system to issue messages via callbacks via
+.Xr event_set_log_callback 3 .
+.Pp
+.Sy Error
+messages that
+.Fn event_base_new
+and
+.Fn event_init
+can report and what they mean:
+.Bl -tag -width Ds
+.It Dq event_base_new: calloc: Cannot allocate memory
+.Fn event_base_new
+failed to allocate memory for the
+.Vt event_base
+structure.
+.It Dq event_base_priority_init: calloc: Cannot allocate memory
+.Fn event_base_new
+failed to allocate memory for event queue.
+.It Dq event_base_priority_init: malloc: Cannot allocate memory
+.Fn event_base_new
+failed to allocate memory for event queue.
+.It Dq event_base_new: no event mechanism available
+Event library support for all kernel notification
+methods is disabled; see
+.Sx ENVIRONMENT .
+.El
+.Pp
+.Sy Diagnostic
+messages that
+.Fn event_base_new
+and
+.Fn event_init
+can report and what they mean:
+.Bl -tag -width Ds
+.It Dq libevent using: kqueue
+The environment variable
+.Ev EVENT_SHOW_METHOD
+is defined and the event library is using
+.Xr kqueue 2 .
+.It Dq libevent using: poll
+The environment variable
+.Ev EVENT_SHOW_METHOD
+is defined and the event library is using
+.Xr poll 2 .
+.It Dq libevent using: select
+The environment variable
+.Ev EVENT_SHOW_METHOD
+is defined and the event library is using
+.Xr select 2 .
+.El
+.Pp
+.Sy Diagnostic
+message that
+.Fn event_base_free
+can report and what it means:
+.Bl -tag -width Ds
+.It Dq event_base_free: @num events were still set in base
+If the event library is compiled with
+.Dv USE_DEBUG
+defined, this reports that the
+.Vt event_base
+structure was freed with
+.Em @num
+events still scheduled.
+.El
+.Sh ERRORS
+The event library usually does not set
+.Xr errno 2 ,
+but instead has its own system to
+issue messages via callbacks which is configured with
+.Xr event_set_log_callback 3 .
 .Sh SEE ALSO
-.Xr event_set_log_callback 3 ,
-.Xr event_base_free 3 ,
-.Xr event_dispatch 3
+.Xr kqueue 2 ,
+.Xr poll 2 ,
+.Xr select 2 ,
+.Xr event_base_loop 3 ,
+.Xr event_reinit 3 ,
+.Xr event_set_log_callback 3
 .Sh HISTORY
 The function
 .Fn event_init
-first appeared in
-.Lb libevent-0.1
-although it's protoype has changed various times since that release. In
-.Lb libevent-1.4.1beta
+first appeared in libevent-0.1 and was first added to
+.Ox 3.2 .
+The current protoype and
 .Fn event_base_new
-was added and
-.Fn event_init
-was once again changed to wrap around the new function.
+was used since libevent-1.4.3 and added to
+.Ox 4.4 .
 .Pp
-Environment variable options first appeared in
-.Lb libevent-0.7a .
+Support for environment variables first appeared in libevent-0.7a and
+.Ox 3.6 .
 .Sh AUTHORS
-The
-.Lb libevent
+The event library
 was written by
 .An -nosplit
 .An Niels Provos
 and
-.An Nick Mathewson
+.An Nick Mathewson .
 .Pp
 This manual was written by
-.An Ted Bullock Aq Mt tbullock@comlore.com
+.An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh CAVEATS
+The event API is generally not thread safe unless only one
+.Vt "event_base"
+structure is accessible per thread or care is taken to lock access.
+Generally the simplified API that is initialized by using
+.Fn event_init
+instead of
+.Fn event_base_new
+is not thread safe.
