@@ -1,6 +1,4 @@
-.\"	$OpenBSD: mdoc.template,v 1.15 2014/03/31 00:09:54 dlg Exp $
-.\"
-.\" Copyright (c) YYYY YOUR NAME HERE <user@your.dom.ain>
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
 .\"
 .\" Permission to use, copy, modify, and distribute this software for any
 .\" purpose with or without fee is hereby granted, provided that the above
@@ -14,43 +12,84 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.\" The following requests are required for all man pages.
-.\"
-.\" Remove `\&' from the line below.
-.Dd $\&Mdocdate$
-.Dt NAME SECTION#
+.Dd $Mdocdate: January 16 2023$
+.Dt EVENT_LOOP 3
 .Os
 .Sh NAME
-.Nm program
-.Nd one line about what it does
+.Nm event_loop ,
+.Nm event_base_loop ,
+.Nm event_dispatch ,
+.Nm event_base_dispatch
+.Nd run an event loop
 .Sh SYNOPSIS
-.\" For a program:  program [-abc] file ...
-.Nm program
-.Op Fl abc
-.Ar
+.In event.h
+.Ft int
+.Fn event_base_dispatch "struct event_base *"
+.Ft int
+.Fn event_dispatch void
+.Ft int
+.Fn event_loop int
+.Ft int
+.Fn event_base_loop "struct event_base *" int
 .Sh DESCRIPTION
+The four functions
+.Fn event_dispatch ,
+.Fn event_base_dispatch ,
+.Fn event_loop
+and
+.Fn event_base_loop
+are all used for event looping in libevent. They are grouped together in the
+same manual because they all perform the same basic function, which is to wait
+for events to occur and then execute the appropriate callback functions.
+.Pp
+.Fn event_dispatch
+and
+.Fn event_base_dispatch
+are used to wait for events to occur and then execute the appropriate callback
+functions. The main difference between these two functions is that
+.Fn event_dispatch
+uses the globally set
+.Vt "event_base" ,
+while
+.Fn event_base_dispatch
+takes an additional parameter of a pointer to a specific event base.
+.Pp
+.Fn event_loop
+and
+.Fn event_base_loop
+are similar to
+.Fn event_dispatch
+and
+.Fn event_base_dispatch ,
+but they take an additional argument of flags. The flags argument can be used
+to specify whether the event loop should run in non-blocking mode or in once
+mode. The
+.Dv EVLOOP_NONBLOCK
+and
+.Dv EVLOOP_ONCE
+flags can be passed to the functions to change their behavior.
+.Pp
+.Fn event_loop
+is a not thread safe variant of event looping it uses the
+current base set.
+.Pp
+.Fn event_base_loop
+is thread safe variant, use with care it takes as a
+parameter a pointer to a specific event base and an flags argument.
+.Sh RETURN VALUES
+All of these functions return 0 if successful, and -1 on error.
+.Sh EXAMPLES
+.Sh SEE ALSO
+.Xr foobar 1
+.Sh HISTORY
+.Sh AUTHORS
 The
-.Nm
-utility processes files ...
-.\" The following requests should be uncommented and used where appropriate.
-.\" .Sh CONTEXT
-.\" For section 9 functions only.
-.\" .Sh RETURN VALUES
-.\" For sections 2, 3, and 9 function return values only.
-.\" .Sh ENVIRONMENT
-.\" For sections 1, 6, 7, and 8 only.
-.\" .Sh FILES
-.\" .Sh EXIT STATUS
-.\" For sections 1, 6, and 8 only.
-.\" .Sh EXAMPLES
-.\" .Sh DIAGNOSTICS
-.\" For sections 1, 4, 6, 7, 8, and 9 printf/stderr messages only.
-.\" .Sh ERRORS
-.\" For sections 2, 3, 4, and 9 errno settings only.
-.\" .Sh SEE ALSO
-.\" .Xr foobar 1
-.\" .Sh STANDARDS
-.\" .Sh HISTORY
-.\" .Sh AUTHORS
-.\" .Sh CAVEATS
-.\" .Sh BUGS
+.Lb libevent
+was written by
+.An -nosplit
+.An Niels Provos
+and
+.An Nick Mathewson
+.Pp
+This manual was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com

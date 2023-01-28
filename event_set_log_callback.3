@@ -55,6 +55,36 @@ This function does not return a value.
 .Xr event 3 ,
 .Xr event_init 3 ,
 .Xr exit 3
+.Sh EXAMPLES
+.Bd -literal -offset indent
+#include <stdio.h>
+#include <event.h>
+
+void
+cb(int sev, const char* msg)
+{
+	printf("%d: %s\en", sev, msg);
+}
+
+int
+main(int argc, char *argv[])
+{
+	/* Redirect diagnostic messages to `cb` callback */
+	event_set_log_callback(cb);
+	/* No need to check return value, failures won't return */
+	struct event_base *base = event_init();
+
+	/* 
+	 * Do something with the event library here:
+	 *  - Add events
+	 *  - Call event_loop(3) or equivalent
+	 */
+
+	/* De-allocate memory */
+	event_base_free(base);
+	return 0;
+}
+.Ed
 .Sh HISTORY
 .Pp
 The event_set_log_callback function was first implemented in
