@@ -64,7 +64,7 @@ To report errors, warnings and diagnostics from
 .Fn event_base_new
 configure the log callback mechanism with
 .Xr event_set_log_callback 3 .
-If an error occurs the function will report the error and then call
+If an error occurs, the function will report the error and then call
 .Xr exit 3
 with a value of 1.
 On error, this function does
@@ -80,11 +80,10 @@ For a complete list of environment variables refer to
 .Pp
 The function
 .Fn event_init
-is a wrapper of
+is a simplified version of
 .Fn event_base_new
-and sets internal global variables.
-This function simplifies the API for programs using only one event loop,
-otherwise, the two functions are equivalent.
+that sets internal global variables and is designed for programs that use only
+one event loop.
 .Pp
 The
 .Fn event_base_free
@@ -137,8 +136,8 @@ Disable library support for
 .Xr select 2 .
 .El
 .Pp
-These environment variables will work unless library detects the program was
-executed as either setuid or setgid using
+These environment variables will work unless the library detects the program
+was executed as either setuid or setgid using
 .Xr issetugid 2 .
 The value of the environment variables is ignored, even if their value is
 empty or zero.
