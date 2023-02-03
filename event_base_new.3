@@ -13,7 +13,7 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: January 21 2023 $
+.Dd $Mdocdate$
 .Dt EVENT_BASE_NEW 3
 .Os
 .Sh NAME
@@ -198,7 +198,7 @@ message that
 .Fn event_base_free
 can report and what it means:
 .Bl -tag -width Ds
-.It Dq event_base_free: @num events were still set in base
+.It Dq event_base_free: Em @num No events were still set in Va base
 If the event library is compiled with
 .Dv USE_DEBUG
 defined, this reports that the
