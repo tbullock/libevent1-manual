@@ -30,21 +30,22 @@
 .Fa "event_log_cb cb"
 .Fc
 .Sh DESCRIPTION
-The event library reports errors and diagnostic messages through a callback
-mechanism that is configured using the
-.Fn event_set_log_callback
-function.
-This function has a single argument, a function pointer,
-.Ft event_log_cb ,
-with a
-.Ft void
-return type and two parameters, an integer and a null-terminated ASCII string.
+The only mechanism that the event library uses to report errors and diagnostic
+messages is through a callback function that is configured using
+.Fn event_set_log_callback .
 .Pp
-The first parameter,
+The event library does not report diagnostics by default, and most functions
+do not modify the
+.Xr errno 2
+value.
+Additionally, in case of error conditions, the event library will always call
+.Xr exit 3 ,
+causing the program to end silently unless a callback is configured.
+.Pp
+The first callback parameter,
 .Fa sev ,
-represents the severity level of the warning or error being reported by the
-event library.
-The severity levels are divided into the following categories:
+represents the severity of the message being reported by the event library.
+Message severity is divided into the following categories:
 .Bl -tag -width Ds
 .It Dv _EVENT_LOG_DEBUG 0
 Messages for debugging purposes.
@@ -59,17 +60,9 @@ program by calling
 .Xr exit 3 .
 .El
 .Pp
-The second parameter of the callback function,
+The second callback parameter,
 .Fa msg ,
 is a null-terminated ASCII string with a maximum length of 1024 bytes.
-.Pp
-The event library does not report diagnostics by default, and most functions
-do not modify the
-.Xr errno 2
-value.
-Additionally, in case of error conditions, the event library will always call
-.Xr exit 3 ,
-causing the program to end silently unless a callback is configured.
 .Pp
 When calling
 .Fn event_set_log_callback ,
