@@ -1,3 +1,4 @@
+.\" $OpenBSD$
 .\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
 .\"
 .\" Permission to use, copy, modify, and distribute this software for any
@@ -11,12 +12,12 @@
 .\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-.Dd $Mdocdate: January 16 2023 $
+.Dd $Mdocdate$
 .Dt EVENT_REINIT 3
 .Os
 .Sh NAME
 .Nm event_reinit
-.Nd Reinitialize the event library after a fork
+.Nd reinitialize the event library after a fork
 .Sh SYNOPSIS
 .In event.h
 .Ft int
@@ -24,96 +25,86 @@
 .Sh DESCRIPTION
 The function
 .Fn event_reinit
-is used to reinitialize the
-.Lb libevent .
-This is typically used after a
-.Xr fork 2
-call in the child process.
+is used to reinitialize the event library in a child process after a call to
+.Xr fork 2 .
+The function reinitializes the internal state of the event library, including
+the event queues and events registered with the kernel notification method.
+See
+.Xr event_base_new 3
+for an explanation of kernel notification methods in the event library.
 .Pp
-The
-.Fn event_reinit
-function takes a single argument, which is a pointer to the
-.Vt event_base
-structure that was previously initialized with
-.Xr event_init 3 .
-The function reinitializes the internal state of the event library,
-including the event notification mechanism and the event queue.
-.Pp
-If the function cannot initialize the kernel notification method, typically
-.Xr kqueue 2 ,
-.Xr poll 2
-or
-.Xr select 2
-it will use the log callback to post the error and call
-.Xr exit 3
-to terminate the child process with return value of 1.
-.Sh RETURN VALUES
 The function
 .Fn event_reinit
-returns 0 on success and -1 when it is unable to reinitialize any scheduled
-events registered to the
-.Vt event_base .
-.Sh EXAMPLES
-This example program demonstrates how to use the
+takes a single argument, a pointer to an
+.Vt event_base
+structure initialized by
+.Xr event_init 3
+or
+.Xr event_base_new 3 .
+.Pp
+The behaviour is undefined if
+.Va base
+is
+.Dv NULL .
+.Sh RETURN VALUES
+On success, the function returns 0.
+If one or more events fail to reinitialize, the function returns -1.
+.Pp
+Fatal error conditions will
+.Em not
+return.
+.Sh DIAGNOSTICS
+The event library relies on its own system to issue messages via callbacks via
+.Xr event_set_log_callback 3 .
+The function
 .Fn event_reinit
-function from the libevent library to reinitialize the event library after a
-fork. It also shows one way to handle errors and customize the way log
-messages are handled.
-.Bd -literal
-#include <event.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/wait.h>
-
-void log_cb(int sev, const char *msg)
-{
-    printf("[EVENT LOG] %s(%d)\\n", msg, sev);
-}
-
-int main()
-{
-	event_set_log_callback(log_cb);
-	struct event_base *base = event_init();
-	pid_t pid = fork();
-	if (pid == 0) {
-		/* Child process */
-		if (event_reinit(base) == -1) {
-			printf("Child: failed to reinitialize events\\n");
-			return 1;
-		}
-		printf("libevent reinitialized in child process.\\n");
-	} else {
-		/* Parent process */
-		int status;
-		wait(&status);
-		if(WIFEXITED(status) && WEXITSTATUS(status) == 1) {
-			printf("Parent: got fatal error from child\\n");
-			return 1;
-		}
-		printf("libevent initialized in parent process.\\n");
-	}
-	event_base_free(base);
-	return 0;
-}
-.Ed
+can potentially cause the following fatal error messages to be sent to the log
+callback:
+.Bl -tag -width Ds
+.It Dq event_base_reinit: could not reinitialize event mechanism
+Failed to reinitialize the kernel notification method.
+.It Dq event_queue_remove: Em @p Po fd Em @d Pc not on queue Em @x
+The internal event library function
+.Fn event_queue_remove
+failed to clear an event queue.
+The message format will be populated as follows:
+.Bl -hyphen -compact -width 1n
+.It
+.Em @p :
+Event structure memory address in hexadecimal format.
+.It
+.Em @d :
+File descriptor in decimal format.
+.It
+.Em @x :
+Event queue number in hexadecimal format corresponding to either
+.Dv EVLIST_INSERTED 0x02
+or
+.Dv EVLIST_ACTIVE 0x08 .
+.El
+.It Dq event_queue_remove: unknown queue Em @q
+The internal event function
+.Fn event_queue_remove
+encountered an unknown queue number, indicated by
+.Em @q
+in hexadecimal format.
+.El
 .Sh SEE ALSO
-.Xr event_init 3 ,
-.Xr event_set_log_callback 3 ,
-.Xr fork 2
+.Xr fork 2 ,
+.Xr event_base_new 3 ,
+.Xr event_set_log_callback 3
 .Sh HISTORY
-The first version of the
-.Lb libevent
-to include
+The function
 .Fn event_reinit
-was version 1.4.1-beta which was released on December 21, 2007.
+was first released in libevent-1.4.3 and included in
+.Ox 4.8 .
 .Sh AUTHORS
-The
-.Lb libevent
+The event library
 was written by
 .An -nosplit
 .An Niels Provos
 and
-.An Nick Mathewson
+.An Nick Mathewson .
 .Pp
 This manual was written by
-.An Ted Bullock Aq Mt tbullock@comlore.com
+.An Ted Bullock Aq Mt tbullock@comlore.com .
