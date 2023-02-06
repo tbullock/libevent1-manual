@@ -21,7 +21,7 @@
 .Nm event_init ,
 .Nm event_reinit ,
 .Nm event_base_free
-.Nd event_base structure allocation, fork reinitialization and deallocation
+.Nd event_base structure initialization
 .Sh SYNOPSIS
 .In event.h
 .Ft "struct event_base *"
@@ -109,12 +109,14 @@ If
 .Fa base
 is
 .Dv NULL
-and the simplified API was not initialized with
+and the simplified API was initialized with
 .Fn event_init ,
 then
 .Fn event_base_free
-will call
-.Xr assert 3 .
+will deallocate the internal library variables.
+Otherwise, it will trigger an
+.Xr assert 3
+call.
 .Pp
 Errors and diagnostics from event library functions are reported using
 the log callback mechanism configured through
@@ -268,7 +270,6 @@ issue messages via callbacks which is configured with
 .Xr kqueue 2 ,
 .Xr poll 2 ,
 .Xr select 2 ,
-.Xr event_base_loop 3 ,
 .Xr event_set_log_callback 3
 .Sh HISTORY
 The function

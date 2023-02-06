@@ -57,7 +57,7 @@ program by calling
 .El
 .Pp
 .Fa msg ,
-is an ASCII string with a maximum length of 1024 bytes.
+is an ASCII string.
 .Pp
 Restore default behavior and prevent callbacks if
 .Fa cb
@@ -66,7 +66,7 @@ is
 .Sh RETURN VALUES
 The function has no return value and is always successful.
 .Sh EXAMPLES
-The following C program illustrates the simplified API and use of
+The following C program illustrates use of
 .Fn event_set_log_callback .
 The callback function
 .Fn cb
@@ -98,20 +98,17 @@ main(int argc, char *argv[])
 {
 	/* Redirect diagnostic messages to `cb` callback */
 	event_set_log_callback(cb);
-	/* Use simplified API; also failures won't return */
+	/* Initialize library; failures won't return */
 	event_init();
 
-	/*
-	 * Do something with the event library here:
-	 */
+	/* Do something with the event library here */
 
-	/* Using simplified API so deallocate memory like this */
+	/* Deallocate memory */
 	event_base_free(NULL);
 	return 0;
 }
 .Ed
 .Sh SEE ALSO
-.Xr event_base_loop 3 ,
 .Xr event_base_new 3 ,
 .Xr exit 3
 .Sh HISTORY
