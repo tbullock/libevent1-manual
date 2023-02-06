@@ -19,14 +19,17 @@
 .Sh NAME
 .Nm event_base_new ,
 .Nm event_init ,
+.Nm event_reinit ,
 .Nm event_base_free
-.Nd event_base structure allocation and deallocation
+.Nd event_base structure allocation, fork reinitialization and deallocation
 .Sh SYNOPSIS
 .In event.h
 .Ft "struct event_base *"
 .Fn event_base_new void
 .Ft "struct event_base *"
 .Fn event_init void
+.Ft int
+.Fn event_reinit "struct event_base *base"
 .Ft void
 .Fn event_base_free "struct event_base *base"
 .Sh DESCRIPTION
@@ -55,21 +58,6 @@ this defaults to
 .Xr kqueue 2 .
 These methods are used by the event library to efficiently monitor events and
 notify programs when they occur.
-After a call to
-.Xr fork 2 ,
-notification mechanisms will need to be reinitialized with
-.Xr event_reinit 3 .
-.Pp
-To report errors, warnings and diagnostics from
-.Fn event_base_new
-configure the log callback mechanism with
-.Xr event_set_log_callback 3 .
-If an error occurs, the function will report the error and then call
-.Xr exit 3
-with status of 1.
-On error, this function does
-.Em not
-return.
 .Pp
 Modify the behavior of
 .Fn event_base_new
@@ -84,6 +72,25 @@ is a simplified version of
 .Fn event_base_new
 that sets internal global variables and is designed for programs that use only
 one event loop.
+.Pp
+After calling
+.Xr fork 2 ,
+the function
+.Fn event_reinit
+must be invoked to reset the event queues and any events registered with
+the kernel notification method in the
+.Vt event_base
+structure of the child process.
+The function takes a single argument, a pointer to an
+.Vt event_base
+structure initialized by
+.Fn event_init
+or
+.Fn event_base_new .
+The behavior is undefined if
+.Va base
+is
+.Dv NULL .
 .Pp
 The
 .Fn event_base_free
@@ -108,6 +115,13 @@ then
 .Fn event_base_free
 will call
 .Xr assert 3 .
+.Pp
+Errors and diagnostics from event library functions are reported using
+the log callback mechanism configured through
+.Xr event_set_log_callback 3 .
+In case of an error, the functions will report the problem and then call
+.Xr exit 3
+with a status of 1.
 .Sh RETURN VALUES
 .Fn event_base_new
 and
@@ -115,6 +129,15 @@ and
 return the newly allocated
 .Vt event_base
 structure.
+.Pp
+On success,
+.Fn event_reinit
+returns 0.
+If one or more events fail to reinitialize, the function returns -1.
+.Pp
+Fatal error conditions will
+.Em not
+return.
 .Sh ENVIRONMENT
 Environment variables that modify the behavior of
 .Fn event_base_new
@@ -193,6 +216,33 @@ is defined and the event library is using
 .Xr select 2 .
 .El
 .Pp
+.Sy Error
+messages that
+.Fn event_reinit
+can report and what they mean:
+.Bl -tag -width Ds
+.It Dq event_base_reinit: could not reinitialize event mechanism
+Failed to reinitialize the kernel notification method.
+.It Dq event_queue_remove: Em @p Po fd Em @d Pc not on queue Em @x
+Failed to clear an event queue.
+The message format will be populated as follows:
+.Bl -hyphen -compact -width 1n
+.It
+.Em @p :
+Event structure memory address in hexadecimal format.
+.It
+.Em @d :
+File descriptor in decimal format.
+.It
+.Em @x :
+Event queue number in hexadecimal format.
+.El
+.It Dq event_queue_remove: unknown queue Em @q
+Encountered an unknown queue number, indicated by
+.Em @q
+in hexadecimal format.
+.El
+.Pp
 .Sy Diagnostic
 message that
 .Fn event_base_free
@@ -214,11 +264,11 @@ but instead has its own system to
 issue messages via callbacks which is configured with
 .Xr event_set_log_callback 3 .
 .Sh SEE ALSO
+.Xr fork 2 ,
 .Xr kqueue 2 ,
 .Xr poll 2 ,
 .Xr select 2 ,
 .Xr event_base_loop 3 ,
-.Xr event_reinit 3 ,
 .Xr event_set_log_callback 3
 .Sh HISTORY
 The function
@@ -230,6 +280,11 @@ The current protoype and
 was used since libevent-1.4.3 and added to
 .Ox 4.4 .
 .Pp
+The function
+.Fn event_reinit
+was first released in libevent-1.4.3 and included in
+.Ox 4.8 .
+.Pp
 Support for environment variables first appeared in libevent-0.7a and
 .Ox 3.6 .
 .Sh AUTHORS
@@ -240,7 +295,7 @@ was written by
 and
 .An Nick Mathewson .
 .Pp
-This manual was written by
+This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
 .Sh CAVEATS
 The event API is generally not thread safe unless only one
