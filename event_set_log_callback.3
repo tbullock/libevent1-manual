@@ -20,6 +20,7 @@
 .Nm event_set_log_callback
 .Nd set callback for diagnostics
 .Sh SYNOPSIS
+.In event.h
 .Ft typedef void
 .Fo (*event_log_cb)
 .Fa "int sev"
@@ -30,22 +31,17 @@
 .Fa "event_log_cb cb"
 .Fc
 .Sh DESCRIPTION
-The only mechanism that the event library uses to report errors and diagnostic
-messages is through a callback function that is configured using
-.Fn event_set_log_callback .
+The event library uses a callback function that is configured using
+.Fn event_set_log_callback
+to report error and diagnostic messages.
+By default the library does not report diagnostics.
+In case of internal errors, the event library will call
+.Xr exit 3 .
 .Pp
-The event library does not report diagnostics by default, and most functions
-do not modify the
-.Xr errno 2
-value.
-Additionally, in case of error conditions, the event library will always call
-.Xr exit 3 ,
-causing the program to end silently unless a callback is configured.
-.Pp
-The first callback parameter,
 .Fa sev ,
-represents the severity of the message being reported by the event library.
-Message severity is divided into the following categories:
+represents the severity of the message.
+.Fa sev
+may be one of:
 .Bl -tag -width Ds
 .It Dv _EVENT_LOG_DEBUG 0
 Messages for debugging purposes.
@@ -60,28 +56,24 @@ program by calling
 .Xr exit 3 .
 .El
 .Pp
-The second callback parameter,
 .Fa msg ,
-is a null-terminated ASCII string with a maximum length of 1024 bytes.
+is an ASCII string with a maximum length of 1024 bytes.
 .Pp
-When calling
-.Fn event_set_log_callback ,
-if
+Restore default behavior and prevent callbacks if
 .Fa cb
-is a null pointer the event library behavior is the same as if no callback was
-provided at all.
+is
+.Dv NULL .
 .Sh RETURN VALUES
 The function has no return value and is always successful.
 .Sh EXAMPLES
-The following C program illustrates the use of
+The following C program illustrates the simplified API and use of
 .Fn event_set_log_callback .
 The callback function
 .Fn cb
-includes logic to identify the four severity levels of diagnostic messages
-the event library can generate.
+includes logic to identify the severity levels of diagnostic messages.
 .Bd -literal -offset indent
-#include <stdio.h>
 #include <event.h>
+#include <stdio.h>
 
 void
 cb(int sev, const char *msg)
@@ -106,17 +98,15 @@ main(int argc, char *argv[])
 {
 	/* Redirect diagnostic messages to `cb` callback */
 	event_set_log_callback(cb);
-	/* No need to check return value, failures won't return */
-	struct event_base *base = event_init();
+	/* Use simplified API; also failures won't return */
+	event_init();
 
 	/*
 	 * Do something with the event library here:
-	 *  - Add events
-	 *  - Call event_base_loop(3) or equivalent
 	 */
 
-	/* De-allocate memory */
-	event_base_free(base);
+	/* Using simplified API so deallocate memory like this */
+	event_base_free(NULL);
 	return 0;
 }
 .Ed
@@ -137,5 +127,5 @@ was written by
 and
 .An Nick Mathewson .
 .Pp
-This manual was written by
+This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
