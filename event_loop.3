@@ -1,3 +1,4 @@
+.\" $OpenBSD$
 .\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
 .\"
 .\" Permission to use, copy, modify, and distribute this software for any
@@ -12,84 +13,126 @@
 .\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
-.Dd $Mdocdate: January 16 2023$
+.Dd $Mdocdate$
 .Dt EVENT_LOOP 3
 .Os
 .Sh NAME
-.Nm event_loop ,
 .Nm event_base_loop ,
-.Nm event_dispatch ,
-.Nm event_base_dispatch
-.Nd run an event loop
+.Nm event_loop ,
+.Nm event_base_dispatch ,
+.Nm event_dispatch
+.Nd start an event loop
 .Sh SYNOPSIS
 .In event.h
 .Ft int
-.Fn event_base_dispatch "struct event_base *"
+.Fn event_base_loop "struct event_base *base" "int flags"
+.Ft int
+.Fn event_loop "int flags"
+.Ft int
+.Fn event_base_dispatch "struct event_base *base"
 .Ft int
 .Fn event_dispatch void
-.Ft int
-.Fn event_loop int
-.Ft int
-.Fn event_base_loop "struct event_base *" int
 .Sh DESCRIPTION
-The four functions
-.Fn event_dispatch ,
-.Fn event_base_dispatch ,
-.Fn event_loop
-and
-.Fn event_base_loop
-are all used for event looping in libevent. They are grouped together in the
-same manual because they all perform the same basic function, which is to wait
-for events to occur and then execute the appropriate callback functions.
+The event library replaces the main loop of a program with the function
+.Fn event_base_loop .
+This operates by waiting for events to occur and then executing an appropriate
+callback function.
+By default, the function returns when there are no more events to process or
+when either the
+.Xr event_base_loopbreak 3
+function is invoked or the
+.Xr event_base_loopexit 3
+timeout has expired.
 .Pp
-.Fn event_dispatch
-and
+The function
+.Fn event_base_loop
+takes two arguments:
+.Bl -tag -width Ds -compact
+.It Va base :
+A pointer to an
+.Vt event_base
+structure initialized by
+.Xr event_base_new 3 .
+The behavior is undefined if
+.Va base
+is
+.Dv NULL .
+.It Va flags :
+A set of flags that modify the behavior of the event loop.
+The following flags are available on
+.Ox :
+.Bl -hyphen -compact -width 1n
+.It
+.Dv EVLOOP_ONCE :
+Run the event loop for only one iteration and then return.
+This is useful for event-driven programs that need to perform some actions
+before continuing.
+.It
+.Dv EVLOOP_NONBLOCK :
+Run the event loop in non-blocking mode.
+In this mode, the function returns immediately if there are no events to
+process.
+.El
+.El
+.Pp
+The function
+.Fn event_loop
+is a version of
+.Fn event_base_loop
+that requires the simplified API to be initialized by
+.Xr event_init 3 .
+The function has one argument,
+.Va flags
+with the same attributes as
+.Fn event_base_loop .
+.Pp
+An equivalent to
+.Fn event_base_loop
+is the older API
 .Fn event_base_dispatch
-are used to wait for events to occur and then execute the appropriate callback
-functions. The main difference between these two functions is that
+that does not support flags to modify its behavior.
+This function is equivalent to calling
+.Fn event_base_loop base 0 .
+Likewise, the function
 .Fn event_dispatch
-uses the globally set
-.Vt "event_base" ,
-while
-.Fn event_base_dispatch
-takes an additional parameter of a pointer to a specific event base.
-.Pp
-.Fn event_loop
-and
-.Fn event_base_loop
-are similar to
-.Fn event_dispatch
-and
-.Fn event_base_dispatch ,
-but they take an additional argument of flags. The flags argument can be used
-to specify whether the event loop should run in non-blocking mode or in once
-mode. The
-.Dv EVLOOP_NONBLOCK
-and
-.Dv EVLOOP_ONCE
-flags can be passed to the functions to change their behavior.
-.Pp
-.Fn event_loop
-is a not thread safe variant of event looping it uses the
-current base set.
-.Pp
-.Fn event_base_loop
-is thread safe variant, use with care it takes as a
-parameter a pointer to a specific event base and an flags argument.
+is equivalent to
+.Fn event_loop 0 .
 .Sh RETURN VALUES
-All of these functions return 0 if successful, and -1 on error.
-.Sh EXAMPLES
+These functions return:
+.Bl -tag -compact -offset 3n -width 3n
+.It -1
+on error.
+.It 0
+on success.
+.It 1
+if no events were scheduled.
+.El
 .Sh SEE ALSO
-.Xr foobar 1
+.Xr event_base_loopbreak 3 ,
+.Xr event_base_new 3
 .Sh HISTORY
+The function
+.Fn event_dispatch
+first appeared in libevent-0.1 and added to
+.Ox 3.2 .
+.Pp
+.Fn event_loop
+appeared in libevent-0.4 and
+.Ox 3.2 .
+.Pp
+The functions
+.Fn event_base_dispatch
+and
+.Fn event_base_loop
+were added to libevent-1.0 and appeared in
+.Ox 3.8 .
 .Sh AUTHORS
-The
-.Lb libevent
+The event library
 was written by
 .An -nosplit
 .An Niels Provos
 and
-.An Nick Mathewson
+.An Nick Mathewson .
 .Pp
-This manual was written by
-.An Ted Bullock Aq Mt tbullock@comlore.com
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
