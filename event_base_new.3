@@ -299,10 +299,10 @@ and
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
 .Sh CAVEATS
-The event API is generally not thread safe unless only one
+The event API is not thread safe unless only one
 .Vt "event_base"
 structure is accessible per thread or care is taken to lock access.
-Generally the simplified API that is initialized by using
+The simplified API that is initialized by using
 .Fn event_init
 instead of
 .Fn event_base_new
