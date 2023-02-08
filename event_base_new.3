@@ -39,8 +39,9 @@ and
 .Fn event_init
 allocate memory and initialize an opaque
 .Vt event_base
-structure that is used to schedule and monitor events in an event loop using
-the operating system's most efficient or stable kernel notification method.
+structure.
+This structure is used to schedule and monitor events using the operating
+system's most efficient or stable kernel notification method.
 .Pp
 Kernel notification methods are ways for a program to be notified of
 events that occur in the operating system's kernel.
@@ -59,10 +60,10 @@ this defaults to
 These methods are used by the event library to efficiently monitor events and
 notify programs when they occur.
 .Pp
-Modify the behavior of
+Environment variables can modify the behavior of
 .Fn event_base_new
-by using environment variables to disable library support for certain kernel
-notification methods and to enable additional diagnostic reporting.
+to disable library support for certain kernel notification methods and to
+enable additional diagnostic reporting.
 For a complete list of environment variables refer to
 .Sx ENVIRONMENT .
 .Pp
