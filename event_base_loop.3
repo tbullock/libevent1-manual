@@ -14,7 +14,7 @@
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
 .Dd $Mdocdate$
-.Dt EVENT_LOOP 3
+.Dt EVENT_BASE_LOOP 3
 .Os
 .Sh NAME
 .Nm event_base_loop ,
@@ -35,14 +35,19 @@
 .Sh DESCRIPTION
 The event library replaces the main loop of a program with the function
 .Fn event_base_loop .
-This operates by waiting for events to occur and then executing an appropriate
-callback function.
-By default, the function returns when there are no more events to process or
-when either the
-.Xr event_base_loopbreak 3
-function is invoked or the
-.Xr event_base_loopexit 3
-timeout has expired.
+This operates by waiting for events to occur and then executing callback
+functions.
+By default, the function returns when there are no more events to monitor.
+.Pp
+There are three types of events this function will monitor including signal,
+kernel and timer.
+POSIX signals are configured using
+.Xr evsignal_init 3 .
+Kernel events such as network activity and changes to file descriptors are
+configured with
+.Xr event_set 3 .
+Timer events are configured with
+.Xr evtimer_set 3 .
 .Pp
 The function
 .Fn event_base_loop
@@ -65,13 +70,15 @@ The following flags are available on
 .It
 .Dv EVLOOP_ONCE :
 Run the event loop for only one iteration and then return.
-This is useful for event-driven programs that need to perform some actions
-before continuing.
+This is useful for integrating into an existing main program loop that needs
+to perform other actions before continuing.
 .It
 .Dv EVLOOP_NONBLOCK :
 Run the event loop in non-blocking mode.
-In this mode, the function returns immediately if there are no events to
-process.
+In this mode, the function will return after processing signal and active
+kernel events but will
+.Em not
+wait for timer events to expire.
 .El
 .El
 .Pp
@@ -101,14 +108,87 @@ is equivalent to
 These functions return:
 .Bl -tag -compact -offset 3n -width 3n
 .It -1
-on error.
+on error,
+.Va errno
+will be set.
 .It 0
-on success.
+on success, asked to terminate loop.
 .It 1
-if no events were scheduled.
+on success, no remaining events left or scheduled in queue.
+.El
+.Sh DIAGNOSTICS
+The event library relies on its own system to issue messages via
+.Xr event_set_log_callback 3 .
+.Pp
+.Sy Diagnostic
+messages that
+.Fn event_base_loop
+and
+.Fn event_base_dispatch
+family of functions will report and what they mean:
+.Bl -tag -width Ds
+.It Dq event_base_loop: asked to terminate loop.
+Function returned because program logic instructed it to.
+This corresponds to return value 0.
+.It Dq event_base_loop: no events registered.
+No events were registered or all events have been cleared.
+This corresponds to return value 1.
+.El
+.Pp
+.Em NOTE
+that internally, the event library generates debug messages throughout its
+callgraph, especially in the event loop.
+Warnings from failed system calls will reflect the kernel notification method
+and report
+.Va errno
+values in their message text.
+.Sh ERRORS
+This function has complex interactions with
+.Va errno .
+The
+.Fn event_base_loop
+family of functions sets
+.Va errno
+corresponding to the kernel notification method the event library is
+using.
+These values will directly correspond to
+.Xr kevent 2 ,
+.Xr poll 2
+or
+.Xr select 2
+system calls; on
+.Ox
+this defaults to
+.Xr kevent 2 .
+See
+.Xr event_base_new 3
+for details on selecting kernel notification methods.
+.Bl -tag -width Er
+.It Bq Er EINTR
+The
+.Fn event_base_loop
+and related functions will
+.Em never
+set
+.Va errno
+to
+.Er EINTR
+on failure.
+.Pp
+If the kernel notification method returns an error to the event loop and sets
+.Va errno
+to
+.Er EINTR ,
+the event library will not treat this as an error and will return control to
+the event loop to wait for the next iteration.
+The built-in support for handling
+.Er EINTR
+means that programs do not need to explicitly handle this failure condition.
 .El
 .Sh SEE ALSO
-.Xr event_base_loopbreak 3 ,
+.Xr kevent 2 ,
+.Xr poll 2 ,
+.Xr select 2 ,
 .Xr event_base_new 3
 .Sh HISTORY
 The function
