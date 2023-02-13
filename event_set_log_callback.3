@@ -80,16 +80,16 @@ cb(int sev, const char *msg)
 {
 	switch (sev) {
 	case _EVENT_LOG_DEBUG:
-		printf("DEBUG: %s\en", sev, msg);
+		printf("DEBUG: %s\en", msg);
 		break;
 	case _EVENT_LOG_MSG:
-		printf("INFO: %s\en", sev, msg);
+		printf("INFO: %s\en", msg);
 		break;
 	case _EVENT_LOG_WARN:
-		printf("WARNING: %s\en", sev, msg);
+		printf("WARNING: %s\en", msg);
 		break;
 	case _EVENT_LOG_ERR:
-		printf("ERROR: %s\en", sev, msg);
+		printf("ERROR: %s\en", msg);
 		break;
 	}
 }
