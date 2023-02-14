@@ -32,17 +32,25 @@
 .Fn event_base_dispatch "struct event_base *base"
 .Ft int
 .Fn event_dispatch void
+.Ft int
+.Fo "(*event_sigcb)"
+.Fa void
+.Fc
+.Ft volatile sig_atomic_t
+.Fa event_gotsig
 .Sh DESCRIPTION
-The event library replaces the main loop of a program with the function
+The event library offers a set of
+.Em event loop
+functions that are based on
 .Fn event_base_loop .
-This operates by waiting for events to occur and then executing callback
-functions.
-By default, the function returns when there are no more events to monitor.
+These functions replace the main loop of a program and wait for events to
+occur before executing corresponding callback functions.
+By default, the event loop returns when there are no more events to monitor.
 .Pp
-There are three types of events this function will monitor including signal,
+There are three types of events these functions will monitor including signal,
 kernel and timer.
 POSIX signals are configured using
-.Xr evsignal_init 3 .
+.Xr signal_set 3 .
 Kernel events such as network activity and changes to file descriptors are
 configured with
 .Xr event_set 3 .
@@ -104,11 +112,43 @@ Likewise, the function
 .Fn event_dispatch
 is equivalent to
 .Fn event_loop 0 .
+.Pp
+New programs expecting to handle signals should use
+.Xr signal_set 3 .
+However, the event loop functions support an older event library mechanic for
+interacting with POSIX signals using standard
+.Xr signal 3
+handlers.
+Programs using this interface need to define two global variables:
+.Dl Vt extern int (*event_sigcb)(void) ;
+.Dl Vt extern volatile sig_atomic_t event_gotsig ;
+.Pp
+The event loop is notified that a signal was received when a signal handler
+sets the
+.Va event_gotsig
+flag to 1.
+To handle signals, a callback function must be defined to manage all expected
+signal types.
+After calling
+.Xr event_init 3
+or
+.Xr event_base_new 3 ,
+the callback function should be assigned to
+.Va event_sigcb
+before executing the event loop.
+The event loop will call the assigned function to process received signals.
+If the function returns \-1, the event loop will terminate immediately and set
+.Va errno
+to
+.Er EINTR .
+Any other return values will be ignored.
 .Sh RETURN VALUES
-These functions return:
+The event loop functions return:
 .Bl -tag -compact -offset 3n -width 3n
-.It -1
-on error,
+.It \-1
+on error or terminated by
+.Va event_sigcb
+signal manager,
 .Va errno
 will be set.
 .It 0
@@ -120,12 +160,10 @@ on success, no remaining events left or scheduled in queue.
 The event library relies on its own system to issue messages via
 .Xr event_set_log_callback 3 .
 .Pp
-.Sy Diagnostic
-messages that
+.Sy Debug
+messages that the
 .Fn event_base_loop
-and
-.Fn event_base_dispatch
-family of functions will report and what they mean:
+event loop functions can report and what they mean:
 .Bl -tag -width Ds
 .It Dq event_base_loop: asked to terminate loop.
 Function returned because program logic instructed it to.
@@ -143,7 +181,7 @@ and report
 .Va errno
 values in their message text.
 .Sh ERRORS
-This function has complex interactions with
+These functions have complex interactions with
 .Va errno .
 The
 .Fn event_base_loop
@@ -168,22 +206,24 @@ for details on selecting kernel notification methods.
 The
 .Fn event_base_loop
 and related functions will
-.Em never
+.Em only
 set
 .Va errno
 to
 .Er EINTR
-on failure.
+if the legacy signal management callback function assigned to
+.Va event_sigcb
+returns \-1.
 .Pp
-If the kernel notification method returns an error to the event loop and sets
+The functions have built-in support for kernel notification methods returning
+an error to the event loop and setting
 .Va errno
 to
-.Er EINTR ,
-the event library will not treat this as an error and will return control to
-the event loop to wait for the next iteration.
-The built-in support for handling
-.Er EINTR
-means that programs do not need to explicitly handle this failure condition.
+.Er EINTR .
+The event library will
+.Em not
+treat this as an error and will return control to the event loop to wait for
+the next iteration.
 .El
 .Sh SEE ALSO
 .Xr kevent 2 ,
@@ -191,21 +231,33 @@ means that programs do not need to explicitly handle this failure condition.
 .Xr select 2 ,
 .Xr event_base_new 3
 .Sh HISTORY
-The function
+This manual is for libevent-1.4, with local changes for
+.Ox .
+.Bl -bullet -width Ds
+.It
 .Fn event_dispatch
-first appeared in libevent-0.1 and added to
+was first introduced in libevent-0.1, and added to
 .Ox 3.2 .
-.Pp
+.It
 .Fn event_loop
-appeared in libevent-0.4 and
+was introduced in libevent-0.4, and added to
 .Ox 3.2 .
-.Pp
-The functions
+.It
 .Fn event_base_dispatch
 and
 .Fn event_base_loop
-were added to libevent-1.0 and appeared in
+were added in libevent-1.0, and appeared in
 .Ox 3.8 .
+.It
+Signal handling using
+.Va event_gotsig
+and
+.Va event_sigcb
+was added in libevent-0.3c, and appeared in
+.Ox 3.2 .
+However, this feature was removed in upstream versions of the library starting
+from version 2.0.2-alpha.
+.El
 .Sh AUTHORS
 The event library
 was written by
@@ -216,3 +268,9 @@ and
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh CAVEATS
+Signal handling using
+.Va event_gotsig
+and
+.Va event_sigcb
+is not thread safe.
