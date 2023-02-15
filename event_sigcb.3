@@ -1,0 +1,103 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVENT_SIGCB 3
+.Os
+.Sh NAME
+.Nm event_sigcb ,
+.Nm event_gotsig
+.Nd deprecated event loop signal handling
+.Sh SYNOPSIS
+.Ft int
+.Fo "(*event_sigcb)"
+.Fa void
+.Fc
+.Ft volatile sig_atomic_t
+.Fa event_gotsig
+.Sh DESCRIPTION
+New programs expecting to handle signals should use
+.Xr signal_set 3 .
+.Pp
+The event loop functions support an older event library mechanic for
+interacting with POSIX signals using standard
+.Xr signal 3
+handlers.
+Programs using this interface need to define two global variables:
+.Pp
+.Dl Vt extern int (*event_sigcb)(void) ;
+.Dl Vt extern volatile sig_atomic_t event_gotsig ;
+.Pp
+The event loop is notified that a signal was received when a signal handler
+sets the
+.Va event_gotsig
+flag to 1.
+To handle signals, a callback function must be defined to manage all expected
+signal types.
+After calling
+.Xr event_init 3
+or
+.Xr event_base_new 3 ,
+the callback function should be assigned to
+.Va event_sigcb
+before executing the event loop.
+The event loop will call the assigned function to process received signals.
+If the function returns \-1, the event loop will terminate immediately and set
+.Va errno
+to
+.Er EINTR .
+Any other return values will be ignored.
+.Sh RETURN VALUES
+Returning \-1 will cause the
+.Xr event_base_loop 3
+family of functions to immediately return \-1 and set
+.Va errno
+to
+.Er EINTR .
+This is deprecated behavior not officially documented in the official manual. 
+.Sh SEE ALSO
+.Xr event_base_loop 3 ,
+.Xr signal 3
+.Sh HISTORY
+This manual is for libevent-1.4, with local changes for
+.Ox .
+.Pp
+.Bl -bullet -width Ds
+.It
+Signal handling using
+.Va event_gotsig
+and
+.Va event_sigcb
+was added in libevent-0.3c, and appeared in
+.Ox 3.2 .
+However, this feature was removed in upstream versions of the library starting
+from version 2.0.2-alpha.
+.El
+.Sh AUTHORS
+The event library
+was written by
+.An -nosplit
+.An Niels Provos
+and
+.An Nick Mathewson .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh CAVEATS
+Signal handling using
+.Va event_gotsig
+and
+.Va event_sigcb
+is not thread safe.
