@@ -32,12 +32,6 @@
 .Fn event_base_dispatch "struct event_base *base"
 .Ft int
 .Fn event_dispatch void
-.Ft int
-.Fo "(*event_sigcb)"
-.Fa void
-.Fc
-.Ft volatile sig_atomic_t
-.Fa event_gotsig
 .Sh DESCRIPTION
 The event library offers a set of
 .Em event loop
@@ -114,45 +108,12 @@ Likewise, the function
 .Fn event_dispatch
 is equivalent to
 .Fn event_loop 0 .
-.Pp
-New programs expecting to handle signals should use
-.Xr signal_set 3 .
-However, the event loop functions support an older event library mechanic for
-interacting with POSIX signals using standard
-.Xr signal 3
-handlers.
-Programs using this interface need to define two global variables:
-.Pp
-.Dl Vt extern int (*event_sigcb)(void) ;
-.Dl Vt extern volatile sig_atomic_t event_gotsig ;
-.Pp
-The event loop is notified that a signal was received when a signal handler
-sets the
-.Va event_gotsig
-flag to 1.
-To handle signals, a callback function must be defined to manage all expected
-signal types.
-After calling
-.Xr event_init 3
-or
-.Xr event_base_new 3 ,
-the callback function should be assigned to
-.Va event_sigcb
-before executing the event loop.
-The event loop will call the assigned function to process received signals.
-If the function returns \-1, the event loop will terminate immediately and set
-.Va errno
-to
-.Er EINTR .
-Any other return values will be ignored.
 .Sh RETURN VALUES
 The event loop functions return:
 .Pp
 .Bl -tag -compact -offset 3n -width 3n
 .It \-1
-on error or terminated by
-.Va event_sigcb
-signal manager,
+on error,
 .Va errno
 will be set.
 .It 0
@@ -211,14 +172,11 @@ for details on selecting kernel notification methods.
 The
 .Fn event_base_loop
 and related functions will
-.Em only
+.Em never
 set
 .Va errno
 to
-.Er EINTR
-if the legacy signal management callback function assigned to
-.Va event_sigcb
-returns \-1.
+.Er EINTR .
 .Pp
 The functions have built-in support for kernel notification methods returning
 an error to the event loop and setting
@@ -254,15 +212,6 @@ and
 .Fn event_base_loop
 were added in libevent-1.0, and appeared in
 .Ox 3.8 .
-.It
-Signal handling using
-.Va event_gotsig
-and
-.Va event_sigcb
-was added in libevent-0.3c, and appeared in
-.Ox 3.2 .
-However, this feature was removed in upstream versions of the library starting
-from version 2.0.2-alpha.
 .El
 .Sh AUTHORS
 The event library
@@ -274,9 +223,3 @@ and
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
-.Sh CAVEATS
-Signal handling using
-.Va event_gotsig
-and
-.Va event_sigcb
-is not thread safe.
