@@ -1,0 +1,98 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVENT_BASE_GET_METHOD 3
+.Os
+.Sh NAME
+.Nm event_base_get_method ,
+.Nm event_get_method ,
+.Nm event_get_version
+.Nd return library parameters
+.Sh SYNOPSIS
+.In event.h
+.Ft "const char *"
+.Fn event_base_get_method "struct event_base *base"
+.Ft "const char *"
+.Fn event_get_method void
+.Ft "const char *"
+.Fn event_get_version void
+.Sh DESCRIPTION
+The
+.Fn event_base_get_method
+function returns the method that
+.Va base
+uses to dispatch events.
+The method refers to the underlying mechanism used by the event loop to
+monitor file descriptors or other events.
+On
+.Ox
+the default method is
+.Xr kqueue 2
+but also supports
+.Xr poll 2
+and
+.Xr select 2 .
+If
+.Va base
+is
+.Dv NULL
+the function does not return.
+.Pp
+.Fn event_get_method
+is similar to
+.Fn event_base_get_method ,
+but the simplified API must be initialized with
+.Xr event_init 3 .
+.Pp
+The function
+.Fn event_get_version
+returns library version in use.
+.Sh RETURN VALUES
+The functions
+.Fn event_base_get_method
+and
+.Fn event_get_method
+return an ASCII string representing the method used to dispatch events.
+.Pp
+.Fn event_get_version
+returns an ASCII string containing the event library version in use.
+.Sh SEE ALSO
+.Xr event_base_new 3
+.Sh HISTORY
+This manual is for libevent-1.4, with local changes for
+.Ox .
+.Bl -bullet -width Ds
+.It
+.Fn event_base_get_method
+was first introduced in libevent-1.4.3, and added to
+.Ox 4.8 .
+.It
+.Fn event_get_version
+and
+.Fn event_get_method
+were added in libevent-1.0c, and appeared in
+.Ox 3.8 .
+.El
+.Sh AUTHORS
+The event library
+was written by
+.An -nosplit
+.An Niels Provos
+and
+.An Nick Mathewson .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
