@@ -50,6 +50,7 @@ main(int argc, char *argv[])
 	event_loopexit(&tv);
 
 	printf("Event Example 01: Quitting in 5 seconds\n");
+	printf("libevent-%s (%s)\n", event_get_version(), event_get_method());
 	/* Start the loop, this is equivalent to event_dispatch() */
 	event_loop(0);
 	printf("All done.\n");
