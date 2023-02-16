@@ -54,7 +54,6 @@ Timer events are configured with
 The function
 .Fn event_base_loop
 takes two arguments:
-.Pp
 .Bl -tag -width Ds
 .It Va base :
 A pointer to an
@@ -69,7 +68,6 @@ is
 A set of flags that modify the behavior of the event loop.
 The following flags are available on
 .Ox :
-.Pp
 .Bl -hyphen -compact -width 1n
 .It
 .Dv EVLOOP_ONCE :
@@ -110,7 +108,6 @@ is equivalent to
 .Fn event_loop 0 .
 .Sh RETURN VALUES
 The event loop functions return:
-.Pp
 .Bl -tag -compact -offset 3n -width 3n
 .It \-1
 on error,
@@ -129,7 +126,6 @@ The event library relies on its own system to issue messages via
 messages that the
 .Fn event_base_loop
 event loop functions can report and what they mean:
-.Pp
 .Bl -tag -width Ds
 .It Dq event_base_loop: asked to terminate loop.
 Function returned because program logic instructed it to.
@@ -196,7 +192,6 @@ the next iteration.
 .Sh HISTORY
 This manual is for libevent-1.4, with local changes for
 .Ox .
-.Pp
 .Bl -bullet -width Ds
 .It
 .Fn event_dispatch
