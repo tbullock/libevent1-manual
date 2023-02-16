@@ -54,7 +54,7 @@ main(int argc, char *argv[])
 	/* Tell event_init to report the kernel notification method. */
 	setenv("EVENT_SHOW_METHOD", "", 1);
 	
-	/* Initialize library; failures won't return. */
+	/* Failures won't return. We need base for event_reinit() */
 	base = event_init();
 
 	if (socketpair(AF_UNIX, SOCK_STREAM, 0, p) == -1) {
@@ -111,9 +111,9 @@ main(int argc, char *argv[])
 
 	printf("All done.\n");
 
-	/* Deallocate memory */
-	event_del(e);
+	/* We are using the event_init() simplified API so free like this */
 	event_base_free(NULL);
+	free(e);
 	return 0;
 }
 
@@ -180,4 +180,5 @@ eventcb(int fd, short events, void *arg)
 			perror("read");
 		}
 	}
+	close(fd);
 }
