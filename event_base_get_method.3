@@ -35,29 +35,30 @@ The
 function returns the method that
 .Va base
 uses to dispatch events.
-The method refers to the underlying mechanism used by the event loop to
-monitor file descriptors or other events.
+This is the underlying mechanism used by the event loop to monitor file
+descriptors or other events.
 On
 .Ox
 the default method is
 .Xr kqueue 2
-but it also supports
+but
 .Xr poll 2
 and
-.Xr select 2 .
-If
+.Xr select 2
+are also supported.
+The function checks
 .Va base
-is
+is not
 .Dv NULL
-the function does not return.
+with
+.Xr assert 3 .
 .Pp
 .Fn event_get_method
 is similar to
 .Fn event_base_get_method ,
-but the simplified API must be initialized with
+but the library must be initialized with
 .Xr event_init 3 .
 .Pp
-The function
 .Fn event_get_version
 returns the library version in use.
 .Sh RETURN VALUES
