@@ -1,0 +1,264 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVENT_SET 3
+.Os
+.Sh NAME
+.Nm event_set ,
+.Nm event_base_set ,
+.Nm event_add ,
+.Nm event_del ,
+.Nm event_active ,
+.Nm event_pending ,
+.Nm event_once ,
+.Nm event_base_once
+.Nd configure an event
+.Sh SYNOPSIS
+.In event.h
+.Ft void
+.Fo event_set
+.Fa "struct event *ev"
+.Fa "int fd"
+.Fa "short events"
+.Fa "void (*fn)(int, short, void *)"
+.Fa "void *arg"
+.Fc
+.Ft int
+.Fn event_base_set "struct event_base *base" "struct event *ev"
+.Ft int
+.Fn event_add "struct event *ev" "const struct timeval *tv"
+.Ft int
+.Fn event_del "struct event *ev"
+.Ft void
+.Fn event_active "struct event *ev" "int res" "short ncalls"
+.Ft int
+.Fn event_pending "struct event *ev" "short events" "struct timeval *tv"
+.Ft int
+.Fo event_once
+.Fa "int fd"
+.Fa "short events"
+.Fa "void (*fn)(int, short, void *)"
+.Fa "void *arg"
+.Fa "const struct timeval *tv"
+.Fc
+.Ft int
+.Fo event_base_once
+.Fa "struct event_base *base"
+.Fa "int fd"
+.Fa "short events"
+.Fa "void (*fn)(int, short, void *)"
+.Fa "void *arg"
+.Fa "const struct timeval *tv"
+.Fc
+.Sh DESCRIPTION
+The
+.Fn event_set
+function prepares an
+.Vt event
+structure to monitor a file descriptor or signal using the event library.
+Once prepared, the
+.Va event
+structure can be added to an event loop using
+.Fn event_add
+to monitor changes or set a timer event that is not associated with any file
+descriptor or signal.
+.Pp
+An event loop waits for and dispatches events or messages in a program.
+This programming construct enables asynchronous programming, allowing a
+program to perform other tasks while waiting for an event to occur.
+Asynchronous programming is useful for handling multiple I/O operations, such
+as network connections, user interfaces, or disk operations, without blocking
+the program.
+The event loop continuously processes events and executes callbacks associated
+with each event.
+.Pp
+Arguments for
+.Fn event_set
+are as follows:
+.Bl -tag -width 7n
+.It Va ev :
+A pointer to a
+.Vt "struct event" .
+If
+.Va ev
+is
+.Dv NULL
+the behavior is undefined.
+.It Va fd :
+The file descriptor or signal to monitor.
+If this is an unassociated timer event, set this to \-1.
+.It Va events :
+Flags indicating how to monitor events.
+If this this is an unassociated timer event, set this to 0.
+.Pp
+.Bl -tag -width 11n -compact
+.It Dv EV_READ :
+Triggered when data is available for reading from the file descriptor.
+.It Dv EV_WRITE :
+Triggered when the file descriptor is ready for writing.
+Can be combined with
+.Dv EV_READ
+to indicate that the program can read from or write to the file descriptor
+without blocking.
+.It Dv EV_SIGNAL :
+Refers to a signal event that is triggered when a specified signal is
+received.
+Cannot be used together with either
+.Dv EV_READ
+or
+.Dv EV_WRITE .
+.It Dv EV_PERSIST :
+Indicates that the event should persist after it triggers.
+That is, it should remain active until it is explicitly removed by calling
+.Fn event_del .
+This flag is typically combined with signal events.
+.El
+.It Va fn :
+A user-defined callback function that is executed when the event triggers.
+.Pp
+.Bl -enum -width Ds -compact
+.It
+The first parameter is an integer representing the file descriptor or signal
+being monitored.
+.It
+The second parameter is the bitmap corresponding to the type of event,
+matching to EV_TIMEOUT, EV_READ, EV_WRITE, EV_SIGNAL and EV_PERSIST.
+.It
+The third parameter corresponds to the user-defined data structure
+passed as a
+.Vt void * .
+.El
+.It Va arg :
+User-defined data structure to pass to the callback function.
+.El
+.Pp
+By default, the
+.Fn event_set
+function associates events with the simplified API.
+However, if a program needs to assign an event to a specific
+.Vt event_base
+structure, it should use the
+.Fn event_base_set
+function after calling
+.Fn event_set .
+The first argument of
+.Fn event_base_set
+is the target
+.Vt event_base
+structure, and the second argument is the
+.Vt event
+to be reassigned.
+The behavior is undefined if either argument is
+.Dv NULL .
+Only events that have not been processed with
+.Fn event_add
+or equivalent functions can be assigned to a new
+.Vt event_base
+structure.
+.Pp
+The
+.Fn event_add
+function registers events to an event loop, using the appropriate kernel
+notification method.
+If a timeout is specified, it's added to the event timeout list.
+Events can also register as timeout events without attaching to file
+descriptors or signals.
+Conversely, events can set
+.Va tv
+to
+.Dv NULL
+to have no timeout associated.
+The behavior is undefined if
+.Va ev
+is
+.Dv NULL.
+.Pp
+The
+.Fn event_del
+function removes an event from an event loop.
+The argument
+.Va ev
+is a pointer to the event scheduled for removal.
+If
+.Va ev
+is
+.Dv NULL ,
+the behavior of the function is undefined.
+On success, it removes the event from internal event queues and unregisters it
+with the kernel notification method.
+The function fails if the simplified API was not initialized with
+.Xr event_init 3
+or the event was not previously assigned to an
+.Vt event_base
+with
+.Fn event_base_set .
+The function does not free memory assigned to user-defined data structures,
+nor does it close open file descriptors.
+.Sh RETURN VALUES
+.Fn event_base_set
+returns 0 on success or returns \-1 if the event being reassigned has already
+been processed by
+.Fn event_add
+or is not in an initialized state.
+.Pp
+.Fn event_add
+returns 0 on success and \-1 on failure.
+If a memory allocation error occurs errno will be set, other errors will cause
+the function to report the error via the log callback set with
+.Xr event_set_log_callback 3
+and then terminate the program with
+.Xr exit 3 .
+.Pp
+.Fn event_del
+return 0 on success and \-1 on failure.
+.Sh ERRORS
+On failure
+.Fn event_add
+can set errno
+as follows:
+.Bl -tag -width Er
+.It Bq Er ENOMEM
+System has insufficient memory to add the event to the event loop. 
+.El
+.Sh SEE ALSO
+.Xr event_base_new 3 ,
+.Xr event_base_loop 3
+.Sh HISTORY
+This manual is for libevent-1.4, with local changes for
+.Ox .
+.Bl -bullet -width Ds
+.It
+.Fn event_set ,
+.Fn event_add
+and
+.Fn event_del
+were added in libevent-0.1, and appeared in
+.Ox 3.2 .
+.It
+.Fn event_base_set
+was introduced in libevent-1.0, and added to
+.Ox 3.8 .
+.El
+.Sh AUTHORS
+The event library
+was written by
+.An -nosplit
+.An Niels Provos
+and
+.An Nick Mathewson .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
