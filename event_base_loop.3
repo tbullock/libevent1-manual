@@ -21,7 +21,7 @@
 .Nm event_loop ,
 .Nm event_base_dispatch ,
 .Nm event_dispatch
-.Nd start an event loop
+.Nd run an event loop
 .Sh SYNOPSIS
 .In event.h
 .Ft int
@@ -33,13 +33,9 @@
 .Ft int
 .Fn event_dispatch void
 .Sh DESCRIPTION
-The event library offers a set of
-.Em event loop
-functions that are based on
-.Fn event_base_loop .
-These functions replace the main loop of a program and wait for events to
-occur before executing corresponding callback functions.
-By default, the event loop returns when there are no more events to monitor.
+These functions run an event loop that replaces the main loop of a program and
+waits for events to occur before executing corresponding callback functions.
+By default, they return when there are no more events to monitor.
 .Pp
 There are three types of events these functions will monitor including signal,
 kernel and timer.
@@ -51,7 +47,6 @@ configured with
 Timer events are configured with
 .Xr evtimer_set 3 .
 .Pp
-The function
 .Fn event_base_loop
 takes two arguments:
 .Bl -tag -width Ds
@@ -66,22 +61,19 @@ is
 .Dv NULL .
 .It Va flags :
 A set of flags that modify the behavior of the event loop.
-The following flags are available on
-.Ox :
+The following flags are available:
 .Pp
 .Bl -hyphen -compact -width 1n
 .It
 .Dv EVLOOP_ONCE :
-Run the event loop for only one iteration and then return.
-This is useful for integrating into an existing main program loop that needs
-to perform other actions before continuing.
+Run the event loop for one iteration and then return.
+This is useful for a main program that needs to perform actions outside
+the event loop.
 .It
 .Dv EVLOOP_NONBLOCK :
 Run the event loop in non-blocking mode.
 In this mode, the function will return after processing signal and active
-kernel events but will
-.Em not
-wait for timer events to expire.
+kernel events but will not wait for timer events to expire.
 .El
 .El
 .Pp
@@ -89,24 +81,22 @@ The function
 .Fn event_loop
 is a version of
 .Fn event_base_loop
-that requires the simplified API to be initialized by
+that requires the library to be initialized by
 .Xr event_init 3 .
 The function has one argument,
 .Va flags ,
 with the same attributes as
 .Fn event_base_loop .
 .Pp
-An equivalent to
-.Fn event_base_loop
-is the older API
 .Fn event_base_dispatch
-that does not support flags to modify its behavior.
-This function is equivalent to calling
-.Fn event_base_loop base 0 .
-Likewise, the function
+is equivalent to calling
+.Fn event_base_loop
+with flags of zero.
+Likewise,
 .Fn event_dispatch
-is equivalent to
-.Fn event_loop 0 .
+is the same as
+.Fn event_loop
+with flags of zero.
 .Sh RETURN VALUES
 The event loop functions return:
 .Pp
@@ -167,24 +157,15 @@ See
 for details on selecting kernel notification methods.
 .Bl -tag -width Er
 .It Bq Er EINTR
-The
+Although the kernel notification methods can set
+.Va errno
+to
+.Er EINTR ,
 .Fn event_base_loop
-and related functions will
-.Em never
-set
+and related functions will never fail with
 .Va errno
-to
+set to
 .Er EINTR .
-.Pp
-The functions have built-in support for kernel notification methods returning
-an error to the event loop and setting
-.Va errno
-to
-.Er EINTR .
-The event library will
-.Em not
-treat this as an error and will return control to the event loop to wait for
-the next iteration.
 .El
 .Sh SEE ALSO
 .Xr kevent 2 ,
