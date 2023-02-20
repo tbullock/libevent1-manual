@@ -1,0 +1,151 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVENT_PENDING 3
+.Os
+.Sh NAME
+.Nm event_pending ,
+.Nm evtimer_pending ,
+.Nm signal_pending ,
+.Nm event_initialized ,
+.Nm evtimer_initialized ,
+.Nm signal_initialized
+.Nd query status of an event
+.Sh SYNOPSIS
+.In event.h
+.Ft int
+.Fn event_pending "struct event *ev" "short events" "struct timeval *tv"
+.Fd #define evtimer_pending(ev, tv)
+.Fd #define signal_pending(ev, tv)
+.Pp
+.Fd #define event_initialized(ev)
+.Fd #define evtimer_initialized(ev)
+.Fd #define signal_initialized(ev)
+.Pp
+.Fd #define EV_TIMEOUT	0x01
+.Fd #define EV_READ	0x02
+.Fd #define EV_WRITE	0x04
+.Fd #define EV_SIGNAL	0x08
+.Sh DESCRIPTION
+Once an event has been scheduled with a running event loop, it possible to
+query its status using
+.Fn event_pending .
+This function checks whether an event is currently pending or scheduled, and
+if it has a timeout, how long until that expires.
+An event is considered
+.Dq pending
+if one or more of the
+.Va event
+flags is currently triggered for the event.
+The arguments are as follows:
+.Bl -tag -width Ds
+.It Va ev :
+A pointer to the event being queried.
+The event
+.Va ev
+must have been scheduled with
+.Fn event_add .
+The behavior is undefined if
+.Va ev
+is
+.Dv NULL .
+.It Va event :
+Flag(s) matching
+.Dv EV_TIMEOUT ,
+.Dv EV_READ ,
+.Dv EV_WRITE
+or
+.Dv EV_SIGNAL .
+.It Va tv :
+If a timeout event is being queried with
+.Dv EV_TIMEOUT
+and the
+.Va tv
+argument is not
+.Dv NULL ,
+the function will calculate the time remaining until the timeout occurs and
+store it in
+.Va tv .
+.El
+.Pp
+Helper macros make it easier to query a timeout or signal event.
+The argument
+.Va ev ,
+must be a pointer to an
+.Vt event
+structure.
+The timeout macro
+.Fn evtimer_pending
+is equivalent to calling
+.Fn event_pending
+as follows:
+.Bd -literal -offset indent
+evtimer_pending(ev, tv);
+event_pending(ev, EV_TIMEOUT, tv);
+.Ed
+.Pp
+Likewise, the signal macro
+.Fn signal_pending
+is equivalent to calling
+.Fn event_pending
+as follows:
+.Bd -literal -offset indent
+signal_pending(ev, tv);
+event_pending(ev, EV_SIGNAL, tv);
+.Ed
+.Pp
+The macros
+.Fn event_initialized ,
+.Fn evtimer_initialized
+and
+.Fn signal_initialized
+evaluate to a value indicating whether whether the event has been added to the
+event loop with
+.Xr event_add 3
+or not.
+The behavior is undefined if
+.Va ev
+is
+.Dv NULL .
+.Sh RETURN VALUES
+.Fn event_pending
+returns 1 if the event is pending, and 0 if the event is scheduled.
+.Pp
+If the
+.Fn event_initialized
+and related macros evaluate to a non-zero value, this indicates that the event
+is initialized.
+If the macro evaluates as zero, this indicates that the event is not
+initialized.
+.Sh SEE ALSO
+.Xr event_set 3
+.Sh HISTORY
+.Fn event_pending
+was added in libevent-0.1, and appeared in
+.Ox 3.2 .
+.Pp
+The helper macros were added to libevent-0.6 and added to
+.Ox 3.2 .
+.Sh AUTHORS
+The event library
+was written by
+.An -nosplit
+.An Niels Provos
+and
+.An Nick Mathewson .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
