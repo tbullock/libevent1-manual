@@ -66,21 +66,68 @@ family of functions to immediately return \-1 and set
 .Va errno
 to
 .Er EINTR .
-This is deprecated behavior not officially documented in the official manual. 
+This is deprecated behavior not officially documented in the official manual.
+.Sh EXAMPLES
+The following program illustrates use of
+.Fn event_sigcb
+and
+.Va event_gotsig .
+.Bd -literal -offset indent
+#include <event.h>
+#include <stdio.h>
+#include <string.h>
+#include <signal.h>
+
+extern int (*event_sigcb)(void);
+extern volatile sig_atomic_t event_gotsig;
+
+int
+signal_manager()
+{
+	printf("Forcing quit.\en");
+	return -1;
+}
+
+void
+handle_signal(int signum)
+{
+	printf(" Rcvd signal %d (%s)\en", signum, strsignal(signum));
+	event_gotsig = 1;
+}
+
+int
+main()
+{
+	/* 30 second sanity timeout to close the program */
+	struct timeval tv;
+	tv.tv_sec = 30;
+	tv.tv_usec = 0;
+
+	signal(SIGINT, handle_signal);
+
+	event_init();
+	event_sigcb = &signal_manager;
+	printf("Run loop for 30 seconds, ctrl-c to force quit.\en");
+	event_loopexit(&tv);
+	event_dispatch();
+	event_base_free(NULL);
+
+	return 0;
+}
+.Ed
 .Sh SEE ALSO
 .Xr event_base_loop 3 ,
 .Xr signal 3
 .Sh HISTORY
 This manual is for libevent-1.4, with local changes for
 .Ox .
-.Pp
 .Bl -bullet -width Ds
 .It
 Signal handling using
 .Va event_gotsig
 and
 .Va event_sigcb
-was added in libevent-0.3c, and appeared in
+was added in libevent-0.3c and appeared in
 .Ox 3.2 .
 However, this feature was removed in upstream versions of the library starting
 from version 2.0.2-alpha.
