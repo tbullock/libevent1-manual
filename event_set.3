@@ -42,7 +42,6 @@
 .Fc
 .Fd #define evtimer_set(ev, fn, arg)
 .Fd #define signal_set(ev, signal, fn, arg)
-.Fc
 .Ft int
 .Fn event_base_set "struct event_base *base" "struct event *ev"
 .Ft int
@@ -76,17 +75,6 @@
 .Fd #define EV_SIGNAL	0x08
 .Fd #define EV_PERSIST	0x10
 .Sh DESCRIPTION
-The
-.Fn event_set
-function prepares an
-.Vt event
-structure to monitor a file descriptor or signal using the event library.
-Once prepared, the
-.Va event
-structure can be added to an event loop using
-.Fn event_add
-to monitor changes or set a timeout.
-.Pp
 An event loop waits for and dispatches events or messages in a program.
 This programming construct enables asynchronous programming, allowing a
 program to perform other tasks while waiting for an event to occur.
@@ -95,6 +83,21 @@ as network connections, user interfaces, or disk operations, without blocking
 the program.
 The event loop continuously processes events and executes callbacks associated
 with each event.
+.Pp
+The
+.Fn event_set
+function prepares an
+.Vt event
+structure to monitor a file descriptor or signal for use with an event loop.
+Once prepared, the
+.Va event
+structure can be scheduled with an event loop using
+.Fn event_add
+to monitor for changes or set a timeout after which a user-defined callback
+function will be executed.
+Refer to
+.Xr event_base_loop 3
+for documentation on running an event loop.
 .Pp
 Arguments for
 .Fn event_set
@@ -113,9 +116,9 @@ The file descriptor or signal to monitor.
 If this is an unassociated timeout event, set this to \-1.
 .It Va events :
 Flag(s) indicating how to monitor events.
-If this this is an unassociated timeout event, set this to 0.
+If this is an unassociated timeout event, set this to 0.
 .Pp
-.Bl -tag -width 11n -compact
+.Bl -tag -width "EV_PERSIST:" -compact
 .It Dv EV_READ :
 Triggered when data is available for reading from the file descriptor.
 .It Dv EV_WRITE :
@@ -158,7 +161,8 @@ User-defined data structure to pass to the callback function.
 .Pp
 There are several helper macros that make it easier to set up timeout and
 signal events in the library.
-The helper macros share a distinct naming convention. For example, the macros
+The helper macros share a distinct naming convention.
+For example, the macros
 .Fn evtimer_set
 and
 .Fn signal_set
@@ -176,7 +180,7 @@ has an equivalent call to
 .Fn event_set :
 .Bd -literal -offset indent
 signal_set(ev, signal, fn, arg);
-event_set(ev, signal, EV_SIGNAL|EV_PERSIST, fn, arg)
+event_set(ev, signal, EV_SIGNAL|EV_PERSIST, fn, arg);
 .Ed
 .Pp
 .Fn event_set
@@ -204,8 +208,13 @@ or equivalent functions can be assigned to a new
 structure.
 .Pp
 .Fn event_add
-registers events to an event loop using the appropriate kernel notification
-method.
+schedules events with an event loop using the appropriate kernel notification
+method
+.Po
+See
+.Fn event_base_new
+for an explanation about kernel notification methods
+.Pc .
 If a timeout is specified, it is added to the event timeout list.
 Events can register as timeout events without attaching to file
 descriptors or signals.
@@ -257,7 +266,7 @@ requiring the caller to create and manage an
 .Vt event
 structure.
 The arguments are as follows:
-.Bl -tag -width 7n
+.Bl -tag -width "events:"
 .It Va base :
 A pointer to an
 .Vt event_base
@@ -267,21 +276,21 @@ The behavior is undefined if
 .Va base
 is
 .Dv NULL .
-.It Va fd
+.It Va fd :
 A file descriptor to monitor.
-.It Va events
+.It Va events :
 Flag(s) matching
 .Dv EV_TIMEOUT ,
 .Dv EV_READ
 or
 .Dv EV_WRITE .
-.It Va fn
+.It Va fn :
 A user-defined callback function that is executed when the event triggers.
 This callback matches the same prototype and design used in
 .Fn event_set .
-.It Va arg
+.It Va arg :
 A user-defined data structure to pass to the callback function.
-.It Va tv
+.It Va tv :
 A pointer to an optional timeout
 .Vt timeval
 structure.
@@ -300,7 +309,7 @@ and removes the argument
 .Pp
 To check the status of a scheduled event, refer to the
 .Xr event_pending 3
-manual.
+manual page.
 If a program needs to manually trigger an event, refer to
 .Xr event_active 3 .
 .Sh RETURN VALUES
@@ -319,7 +328,7 @@ and then terminate the program with
 .Xr exit 3 .
 .Pp
 .Fn event_del
-return 0 on success and \-1 on failure.
+returns 0 on success and \-1 on failure.
 .Pp
 .Fn event_base_once
 and
@@ -364,7 +373,7 @@ appeared first in libevent-1.3c and included in
 .Ox 4.4 .
 .It
 The helper macros were added to libevent-0.6 and added to
-.Ox 3.2.
+.Ox 3.2 .
 .El
 .Sh AUTHORS
 The event library
