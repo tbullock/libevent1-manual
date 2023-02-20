@@ -1,0 +1,73 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt event_active 3
+.Os
+.Sh NAME
+.Nm event_active
+.Nd manually trigger an event
+.Sh SYNOPSIS
+.In event.h
+.Ft void
+.Fn event_active "struct event *ev" "int res" "short ncalls"
+.Sh DESCRIPTION
+Programs may need to manually trigger events with user-defined behavior.
+This is accomplished with the
+.Fn event_active
+function.
+The arguments are as follows:
+.Bl -tag -width "ncalls:"
+.It Va ev :
+A pointer to the event to be triggered, if
+.Va ev
+is
+.Dv NULL
+the behavior is undefined.
+.It Va res :
+A bitmask specifying which event types should be activated
+.Po
+.Dv EV_TIMEOUT ,
+.Dv EV_READ ,
+.Dv EV_WRITE ,
+.Dv EV_READ
+or
+.Dv EV_SIGNAL
+.Pc .
+.It Va ncalls :
+The number of times the callback function should be executed.
+The behavior is undefined if
+.Va ncalls
+is negative or zero.
+.Pp
+If the event has already been triggered but has not yet been processed by the
+event loop, this function will have no effect.
+.El
+.Sh SEE ALSO
+.Xr event_set 3
+.Sh HISTORY
+.Fn event_active
+was first released in libevent-0.4 and included in
+.Ox 3.2 .
+.Sh AUTHORS
+The event library
+was written by
+.An -nosplit
+.An Niels Provos
+and
+.An Nick Mathewson .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
