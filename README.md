@@ -135,7 +135,7 @@ Here is a rough breakdown of the documentation project so far.
 | event_base_once                | Yes | event_set.3                | Yes  |
 | event_once                     | Yes | event_set.3                | Yes  |
 |--------------------------------|-----|----------------------------|------|
-| event_active                   | Yes | event_active.3             | No   |
+| event_active                   | Yes | event_active.3             | Yes  |
 |--------------------------------|-----|----------------------------|------|
 | event_pending                  | Yes | event_pending.3            | Yes  |
 | event_initialized              | Yes | event_pending.3            | Yes  |
@@ -185,7 +185,7 @@ Here is a rough breakdown of the documentation project so far.
 | bufferevent_write              | Yes |                            | No   |
 | bufferevent_write_buffer       | Yes |                            | No   |
 |--------------------------------|-----|----------------------------|------|
-| encode_int                     | No  |                            |      |
+| encode_int                     | Yes |                            |      |
 |--------------------------------|-----|----------------------------|------|
 | evbuffer_add                   | Yes |                            | No   |
 | evbuffer_add_buffer            | Yes |                            | No   |
@@ -241,3 +241,5 @@ Here is a rough breakdown of the documentation project so far.
 | evtag_unmarshal_string         | Yes |                            | No   |
 | evtag_unmarshal_timeval        | Yes |                            | No   |
 |--------------------------------|-----|----------------------------|------|
+
+
