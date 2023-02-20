@@ -321,7 +321,7 @@ or is not in an initialized state.
 .Pp
 .Fn event_add
 returns 0 on success and \-1 on failure.
-If a memory allocation fault occurs errno will be set, other errors will cause
+If a memory allocation fault occurs errno will be set; other errors will cause
 the function to report the error via the log callback set with
 .Xr event_set_log_callback 3
 and then terminate the program with
@@ -357,11 +357,11 @@ This manual is for libevent-1.4, with local changes for
 .Fn event_add ,
 and
 .Fn event_del
-were added in libevent-0.1, and appeared in
+were added in libevent-0.1 and appeared in
 .Ox 3.2 .
 .It
 .Fn event_base_set
-was introduced in libevent-1.0, and added to
+was introduced in libevent-1.0 and added to
 .Ox 3.8 .
 .It
 .Fn event_once
