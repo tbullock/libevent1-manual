@@ -161,14 +161,14 @@ Here is a rough breakdown of the documentation project so far.
 | signal_set                     | Yes | event_set.3                | Yes  |
 | signal_add                     | Yes | event_set.3                | Yes  |
 | signal_del                     | Yes | event_set.3                | Yes  |
-| signal_pending                 | Yes | event_set.3                | Yes  |
-| signal_initialized             | Yes | event_set.3                | Yes  |
+| signal_pending                 | Yes | event_pending.3            | Yes  |
+| signal_initialized             | Yes | event_pending.3            | Yes  |
 |--------------------------------|-----|----------------------------|------|
 | evtimer_set                    | Yes | event_set.3                | Yes  |
 | evtimer_add                    | Yes | event_set.3                | Yes  |
 | evtimer_del                    | Yes | event_set.3                | Yes  |
-| evtimer_pending                | Yes | event_set.3                | Yes  |
-| evtimer_initialized            | Yes | event_set.3                | Yes  |
+| evtimer_pending                | Yes | event_pending.3            | Yes  |
+| evtimer_initialized            | Yes | event_pending.3            | Yes  |
 |--------------------------------|-----|----------------------------|------|
 | bufferevent_base_set           | Yes |                            | No   |
 | bufferevent_disable            | Yes |                            | No   |
