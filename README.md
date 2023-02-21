@@ -211,9 +211,9 @@ Here is a rough breakdown of the documentation project so far.
 | event_loopbreak                | Yes |                            | No   |
 | event_loopexit                 | Yes |                            | No   |
 |--------------------------------|-----|----------------------------|------|
-| event_priority_init            | Yes |                            | No   |
-| event_priority_set             | Yes |                            | No   |
-| event_base_priority_init       | Yes |                            | No   |
+| event_priority_init            | Yes | event_base_priority_init.3 | Yes  |
+| event_priority_set             | Yes | event_base_priority_init.3 | Yes  |
+| event_base_priority_init       | Yes | event_base_priority_init.3 | Yes  |
 |--------------------------------|-----|----------------------------|------|
 | evsignal_add                   | Yes |                            | No   |
 | evsignal_dealloc               | Yes |                            | No   |
