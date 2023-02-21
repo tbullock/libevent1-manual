@@ -57,7 +57,7 @@ for the first time.
 The arguments are as follows:
 .Bl -tag -width "npriorities:"
 .It Va base :
-A pointer to a
+A pointer to an
 .Vt event_base
 structure returned by
 .Xr event_base_new 3
@@ -99,7 +99,7 @@ configure the queue number of new events to the integer calculated by
 dividing the total number of queues by two.
 This has the effect of configuring new events approximately in the middle of
 the queue list.
-The queue number of an event can then manually configured using
+The queue number of an event can then be manually configured using
 .Fn event_priority_set .
 The arguments to this function are as follows:
 .Bl -tag -width Ds

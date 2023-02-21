@@ -40,10 +40,10 @@
 .Fd #define EV_WRITE	0x04
 .Fd #define EV_SIGNAL	0x08
 .Sh DESCRIPTION
-Once an event has been scheduled with a running event loop, it possible to
+Once an event has been scheduled with a running event loop, it is possible to
 query its status using
 .Fn event_pending .
-This function checks whether an event is currently pending or scheduled, and
+This function checks whether an event is currently pending or scheduled and,
 if it has a timeout, how long until that expires.
 An event is considered
 .Dq pending
@@ -63,7 +63,7 @@ The behavior is undefined if
 is
 .Dv NULL .
 .It Va event :
-Flag(s) matching
+Flags matching
 .Dv EV_TIMEOUT ,
 .Dv EV_READ ,
 .Dv EV_WRITE
@@ -83,7 +83,7 @@ store it in
 .Pp
 Helper macros make it easier to query a timeout or signal event.
 The argument
-.Va ev ,
+.Va ev
 must be a pointer to an
 .Vt event
 structure.
@@ -112,8 +112,8 @@ The macros
 .Fn evtimer_initialized
 and
 .Fn signal_initialized
-evaluate to a value indicating whether whether the event has been added to the
-event loop with
+evaluate to a value indicating whether the event has been added to the event
+loop with
 .Xr event_add 3
 or not.
 The behavior is undefined if

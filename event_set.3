@@ -115,7 +115,7 @@ the behavior is undefined.
 The file descriptor or signal to monitor.
 If this is an unassociated timeout event, set this to \-1.
 .It Va events :
-Flag(s) indicating how to monitor events.
+Flags indicating how to monitor events.
 If this is an unassociated timeout event, set this to 0.
 .Pp
 .Bl -tag -width "EV_PERSIST:" -compact
@@ -210,11 +210,9 @@ structure.
 .Fn event_add
 schedules events with an event loop using the appropriate kernel notification
 method
-.Po
-See
+(See
 .Fn event_base_new
-for an explanation about kernel notification methods
-.Pc .
+for an explanation about kernel notification methods).
 If a timeout is specified, it is added to the event timeout list.
 Events can register as timeout events without attaching to file
 descriptors or signals.
@@ -279,7 +277,7 @@ is
 .It Va fd :
 A file descriptor to monitor.
 .It Va events :
-Flag(s) matching
+Flags matching
 .Dv EV_TIMEOUT ,
 .Dv EV_READ
 or
