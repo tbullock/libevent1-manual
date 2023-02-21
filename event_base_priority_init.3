@@ -1,0 +1,180 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVENT_BASE_PRIORITY_INIT 3
+.Os
+.Sh NAME
+.Nm event_base_priority_init ,
+.Nm event_priority_init ,
+.Nm event_priority_set
+.Nd configure priority event queues
+.Sh SYNOPSIS
+.In event.h
+.Ft int
+.Fn event_base_priority_init "struct event_base *base" "int npriorities"
+.Ft int
+.Fn event_priority_init "int npriorities"
+.Ft int
+.Fn event_priority_set "struct event *ev" "int pri"
+.Sh DESCRIPTION
+Programs may need to prioritize the processing of some events over others.
+The library allows programs to control the order in which events are
+executed so that the most important events are processed first.
+.Pp
+When enabled, the event library stores events in multiple queues of different
+priority, executing events in lower numbered queues before events in higher
+numbered queues.
+When processing an active queue, the library will check for new events that
+were added to lower numbered queues before moving on to a higher numbered
+queue.
+.Pp
+Under high load situations, events in lower numbered queues may consume most
+of the processing time and starve higher numbered ones, so it is important to
+carefully consider the priorities of events to ensure that critical events are
+processed promptly.
+.Pp
+The function
+.Fn event_base_priority_init
+is used to configure the number of prioritized queues assigned to an
+.Vt event_base
+structure.
+This function is designed to be called before a program calls
+.Xr event_set 3
+for the first time.
+The arguments are as follows:
+.Bl -tag -width "npriorities:"
+.It Va base :
+A pointer to a
+.Vt event_base
+structure returned by
+.Xr event_base_new 3
+or
+.Xr event_init 3 .
+The behavior is undefined if
+.Va base
+is
+.Dv NULL .
+.It Va npriorities :
+The number of prioritized event queues.
+A positive integer value greater than or equal to one.
+The behavior is undefined if the value is less than or equal to zero.
+If
+.Va npriorities
+is the same as the current number of queues, no changes will be made.
+.El
+.Pp
+The function will fail if executed with active events in the event queues
+.Po
+that is, after
+.Xr event_dispatch 3
+was called
+.Pc .
+.Pp
+.Fn event_priority_init
+is equivalent to
+.Fn event_base_priority_init
+but removes the
+.Va base
+argument and requires that the library was initialized with
+.Xr event_init 3 .
+.Pp
+By default, the functions
+.Xr event_base_set 3
+and
+.Xr event_set 3
+configure the queue number of new events to the integer calculated by
+dividing the total number of queues by two.
+This has the effect of configuring new events approximately in the middle of
+the queue list.
+The queue number of an event can then manually configured using
+.Fn event_priority_set .
+The arguments to this function are as follows:
+.Bl -tag -width Ds
+.It Va ev :
+A pointer to an
+.Vt event
+structure configured by either
+.Xr event_base_set 3
+or
+.Xr event_set 3 .
+The behavior is undefined if
+.Va ev
+is
+.Dv NULL .
+.It Va pri
+An integer representing the queue number being assigned to this event.
+Valid queue numbers start at zero and end at the number of queues minus one.
+The number of queues refers to the argument
+.Va npriorities
+from the call to
+.Fn event_base_priority_init ;
+the default number of queues is one.
+.El
+.Pp
+The function will fail if the event has already been scheduled with
+.Xr event_add 3
+or the value of
+.Va pri
+is invalid.
+.Sh RETURN VALUES
+.Fn event_base_priority_init ,
+.Fn event_priority_init
+and
+.Fn event_priority_set
+return the value 0 if successful; otherwise the value \-1 is returned.
+.Sh DIAGNOSTICS
+The event library relies on its own system to issue messages via callbacks
+configured with
+.Xr event_set_log_callback 3 .
+.Pp
+.Sy Error
+messages that
+.Fn event_base_priority_init
+can report and what they mean:
+.Bl -tag -width Ds
+.It Dq event_base_priority_init: calloc
+The library failed to allocate memory for the list of event queues.
+The program will terminate by calling
+.Xr exit 3 .
+.It Dq event_base_priority_init: malloc
+The library failed to allocate memory for at least one event queue.
+The program will terminate by calling
+.Xr exit 3 .
+.El
+.Sh SEE ALSO
+.Xr event_base_new 3 ,
+.Xr event_set 3 ,
+.Xr event_set_log_callback 3
+.Sh HISTORY
+This manual is for libevent-1.4, with local changes for
+.Ox .
+.Pp
+.Fn event_base_priority_init ,
+.Fn event_priority_init ,
+and
+.Fn event_priority_set
+were introduced in libevent-1.0 and added to
+.Ox 3.8 .
+.Sh AUTHORS
+The event library
+was written by
+.An -nosplit
+.An Niels Provos
+and
+.An Nick Mathewson .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
