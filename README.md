@@ -206,10 +206,10 @@ Here is a rough breakdown of the documentation project so far.
 | event_asr_abort                | Yes |                            | No   |
 | event_asr_run                  | Yes |                            | No   |
 |--------------------------------|-----|----------------------------|------|
-| event_base_loopbreak           | Yes |                            | No   |
-| event_base_loopexit            | Yes |                            | No   |
-| event_loopbreak                | Yes |                            | No   |
-| event_loopexit                 | Yes |                            | No   |
+| event_base_loopbreak           | Yes | event_base_loopbreak.3     | No   |
+| event_base_loopexit            | Yes | event_base_loopbreak.3     | No   |
+| event_loopbreak                | Yes | event_base_loopbreak.3     | No   |
+| event_loopexit                 | Yes | event_base_loopbreak.3     | No   |
 |--------------------------------|-----|----------------------------|------|
 | event_priority_init            | Yes | event_base_priority_init.3 | Yes  |
 | event_priority_set             | Yes | event_base_priority_init.3 | Yes  |

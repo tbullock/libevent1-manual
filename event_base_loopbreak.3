@@ -59,12 +59,12 @@ Programs can use
 .Fn event_base_loopexit
 to schedule the event loop to terminate after a certain amount of time has
 passed.
-This function schedules a timeout event that when triggered, instructs the
+This function schedules a timeout event that, when triggered, instructs the
 event loop to return after processing the current pending event queue.
 The timeout event is configured with the default queue number; for further
 information see
 .Xr event_base_priority_init 3 .
-The function will fail if it unable to configure the timeout event.
+The function will fail if it is unable to configure the timeout event.
 The arguments are as follows:
 .Bl -tag -width Ds
 .It Va base :
@@ -104,7 +104,7 @@ return the value 0 if successful; otherwise the value \-1 is returned.
 .Sh SEE ALSO
 .Xr event_base_loop 3 ,
 .Xr event_base_priority_init 3 ,
-.Xr event_pending 3 
+.Xr event_pending 3
 .Sh HISTORY
 This manual is for libevent-1.4, with local changes for
 .Ox .
@@ -113,7 +113,7 @@ This manual is for libevent-1.4, with local changes for
 .Fn event_loopexit
 was added to libevent-0.8 and
 .Fn event_base_loopexit
-in libevent-1.0c, both were included in
+in libevent-1.0c; both were included in
 .Ox 3.8 .
 .It
 .Fn event_base_loopbreak
