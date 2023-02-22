@@ -1,0 +1,134 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVENT_BASE_LOOPBREAK 3
+.Os
+.Sh NAME
+.Nm event_base_loopbreak ,
+.Nm event_base_loopexit ,
+.Nm event_loopbreak ,
+.Nm event_loopexit
+.Nd schedule an event loop to terminate
+.Sh SYNOPSIS
+.Ft int
+.Fn event_base_loopbreak "struct event_base *base"
+.Ft int
+.Fn event_base_loopexit "struct event_base *base" "const struct timeval *tv"
+.Ft int
+.Fn event_loopbreak void
+.Ft int
+.Fn event_loopexit void
+.Sh DESCRIPTION
+The event library normally stops an event loop when no scheduled events remain
+left to process.
+Programs may need to terminate an event loop early for a variety
+of reasons such as received signals, failed connections, timeouts or other
+user-defined behavior.
+.Pp
+Programs wanting to terminate an event loop immediately can call
+.Fn event_base_loopbreak .
+This function is intended to be called from within a user-defined event
+callback where it instructs the event loop to terminate after the callback
+has been processed.
+The argument
+.Va base
+is a pointer to an
+.Vt event_base
+structure initialized by
+.Xr event_base_new 3 .
+If
+.Va base
+is
+.Dv NULL
+the function will fail.
+.Pp
+Programs can use
+.Fn event_base_loopexit
+to schedule the event loop to terminate after a certain amount of time has
+passed.
+This function schedules a timeout event that when triggered, instructs the
+event loop to return after processing the current pending event queue.
+The timeout event is configured with the default queue number; for further
+information see
+.Xr event_base_priority_init 3 .
+The function will fail if it unable to configure the timeout event.
+The arguments are as follows:
+.Bl -tag -width Ds
+.It Va base :
+A pointer to an
+.Vt event_base
+structure configured by
+.Xr event_base_set 3 .
+The behavior is undefined if
+.Va base
+is
+.Dv NULL .
+.It Va tv :
+A pointer to a populated
+.Vt timeval
+structure representing the amount of time until the timeout expires.
+Negative timeout values will expire the event upon processing.
+.El
+.Pp
+.Fn event_loopbreak
+has equivalent behavior to
+.Fn event_base_loopbreak
+but removes the
+.Va base
+argument and requires that the library must be initialized with
+.Xr event_init 3 .
+Likewise,
+.Fn event_loopexit
+is equivalent to
+.Fn event_base_loopexit .
+.Sh RETURN VALUES
+.Fn event_base_loopbreak ,
+.Fn event_base_loopexit ,
+.Fn event_loopbreak ,
+and
+.Fn event_loopexit
+return the value 0 if successful; otherwise the value \-1 is returned.
+.Sh SEE ALSO
+.Xr event_base_loop 3 ,
+.Xr event_base_priority_init 3 ,
+.Xr event_pending 3 
+.Sh HISTORY
+This manual is for libevent-1.4, with local changes for
+.Ox .
+.Bl -bullet -width Ds
+.It
+.Fn event_loopexit
+was added to libevent-0.8 and
+.Fn event_base_loopexit
+in libevent-1.0c, both were included in
+.Ox 3.8 .
+.It
+.Fn event_base_loopbreak
+and
+.Fn event_loopbreak
+were released in libevent-1.4.3-stable and appeared in
+.Ox 4.8 .
+.El
+.Sh AUTHORS
+The event library
+was written by
+.An -nosplit
+.An Niels Provos
+and
+.An Nick Mathewson .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
