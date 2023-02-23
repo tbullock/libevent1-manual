@@ -194,22 +194,22 @@ Here is a rough breakdown of the documentation project so far.
 | evbuffer_drain                 | Yes |                            | No   |
 | evbuffer_expand                | Yes |                            | No   |
 | evbuffer_find                  | Yes |                            | No   |
-| evbuffer_free                  | Yes |                            | No   |
-| evbuffer_new                   | Yes |                            | No   |
+| evbuffer_free                  | Yes | evbuffer_new.3             | Yes  |
+| evbuffer_new                   | Yes | evbuffer_new.3             | Yes  |
 | evbuffer_read                  | Yes |                            | No   |
 | evbuffer_readline              | Yes |                            | No   |
 | evbuffer_readln                | Yes |                            | No   |
 | evbuffer_remove                | Yes |                            | No   |
-| evbuffer_setcb                 | Yes |                            | No   |
+| evbuffer_setcb                 | Yes | evbuffer_new.3             | Yes  |
 | evbuffer_write                 | Yes |                            | No   |
 |--------------------------------|-----|----------------------------|------|
 | event_asr_abort                | Yes |                            | No   |
 | event_asr_run                  | Yes |                            | No   |
 |--------------------------------|-----|----------------------------|------|
-| event_base_loopbreak           | Yes | event_base_loopbreak.3     | No   |
-| event_base_loopexit            | Yes | event_base_loopbreak.3     | No   |
-| event_loopbreak                | Yes | event_base_loopbreak.3     | No   |
-| event_loopexit                 | Yes | event_base_loopbreak.3     | No   |
+| event_base_loopbreak           | Yes | event_base_loopbreak.3     | Yes  |
+| event_base_loopexit            | Yes | event_base_loopbreak.3     | Yes  |
+| event_loopbreak                | Yes | event_base_loopbreak.3     | Yes  |
+| event_loopexit                 | Yes | event_base_loopbreak.3     | Yes  |
 |--------------------------------|-----|----------------------------|------|
 | event_priority_init            | Yes | event_base_priority_init.3 | Yes  |
 | event_priority_set             | Yes | event_base_priority_init.3 | Yes  |
@@ -222,7 +222,7 @@ Here is a rough breakdown of the documentation project so far.
 | evsignal_process               | Yes |                            | No   |
 | \_evsignal_restore_handler     | Yes |                            | No   |
 | \_evsignal_set_handler         | Yes |                            | No   |
-|--------------------------------|-----|----------------------------|-------
+|--------------------------------|-----|----------------------------|------|
 | evtag_consume                  | Yes |                            | No   |
 | evtag_decode_int               | Yes |                            | No   |
 | evtag_decode_tag               | Yes |                            | No   |

@@ -1,0 +1,155 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVBUFFER_NEW 3
+.Os
+.Sh NAME
+.Nm evbuffer_new ,
+.Nm evbuffer_free ,
+.Nm evbuffer_setcb
+.Nd evbuffer initialization
+.Sh SYNOPSIS
+.In event.h
+.Ft "struct evbuffer *"
+.Fn evbuffer_new void
+.Ft void
+.Fn evbuffer_free "struct evbuffer *buffer"
+.Ft void
+.Fo evbuffer_setcb
+.Fa "struct evbuffer *buffer"
+.Fa "void (*cb)(struct evbuffer *buf, size_t old, size_t new, void * arg)"
+.Fa "void *cbarg"
+.Fc
+.Sh DESCRIPTION
+The event library provides a collection of interfaces for managing buffered
+input and output in the form of the
+.Sy evbuffer
+family of functions.
+These functions offer fine-grained control over buffering, reading, writing
+and processing data.
+It is not necessary to use the event loop functionality of the library in
+conjunction with
+.Sy evbuffer
+functions.
+.Pp
+The
+.Va evbuffer
+data structure is used throughout the
+.Sy evbuffer
+API for buffering and manipulating sequences of bytes.
+It is a dynamic buffer that can grow as data is added to it and can be used
+for a variety of purposes, including network and file I/O as well as
+intra-process communication.
+An optional user-defined callback can be assigned to an
+.Va evbuffer
+to notify programs of changes to the data structure.
+.Pp
+.Fn evbuffer_new
+allocates memory for a new, empty
+.Va evbuffer
+structure that can be used to store data and can be passed to other functions
+in the library to append, remove, or modify data in the buffer.
+.Pp
+.Fn evbuffer_free
+releases all resources associated with an
+.Va evbuffer
+structure.
+Memory in the buffer is not zeroed nor is it explicitly discarded.
+.Pp
+.Fn evbuffer_setcb
+configures an
+.Vt evbuffer
+with an optional user-defined callback
+.Va cb .
+The event library triggers the callback after the number of bytes stored in
+the buffer changes.
+In normal program operation, as data is added to and drained from the
+.Va evbuffer ,
+the callback function provides a mechanism for the program to dynamically
+learn about its status.
+The arguments are as follows:
+.Bl -tag -width 7n
+.It Va buffer :
+A pointer to an
+.Vt evbuffer
+structure.
+The behavior is undefined if
+.Va buffer
+is
+.Dv NULL .
+.It Va cb :
+A function pointer to a callback function.
+The behavior if
+.Va cb
+is
+.Dv NULL ,
+is to reset the
+.Vt evbuffer
+to not use a callback.
+The function parameters are as follows:
+.Pp
+.Bl -tag -width Ds -compact
+.It Va buf :
+A pointer to the
+.Vt evbuffer
+structure that triggered the callback.
+.It Va old :
+The original buffer size (bytes) before the change that triggered this
+callback.
+.It Va new :
+The new buffer size (bytes) after the change that triggered this callback.
+.It Va arg :
+A void pointer to a user-defined data structure passed to the callback that
+corresponds to
+.Va cbarg .
+.El
+.It Va cbarg :
+A user-defined data structure that is passed to the callback function
+.Va cb
+as parameter
+.Va arg .
+.El
+.Sh RETURN VALUES
+.Fn evbuffer_new
+returns a pointer to a new
+.Va evbuffer
+structure on success or
+.Dv NULL
+on failure.
+On failure the function will set
+.Va errno
+equivalent to
+.Xr calloc 3 .
+.Sh HISTORY
+This manual is for libevent-1.4, with local changes for
+.Ox .
+.Pp
+.Fn evbuffer_new ,
+.Fn evbuffer_free
+and
+.Fn evbuffer_setcb
+were introduced in libevent-0.8 and added to
+.Ox 3.6 .
+.Sh AUTHORS
+The event library
+was written by
+.An -nosplit
+.An Niels Provos
+and
+.An Nick Mathewson .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
