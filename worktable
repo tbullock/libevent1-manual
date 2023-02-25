@@ -20,10 +20,10 @@ Ted: TTD; has internal list of things to adjust
 
 | Function                       | Pub | Manual                     | Done | Ingo | Jason | Nick | Ted | Notes                                   |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_base_new                 | Yes | event_base_new.3           | No   |      | OK    | Ok   | TTD | Don't document DEBUG messages           |
-| event_init                     | Yes | event_base_new.3           | No   |      | OK    | Ok   | TTD |                                         |
-| event_reinit                   | Yes | event_base_new.3           | No   |      | OK    | Ok   | TTD |                                         |
-| event_base_free                | Yes | event_base_new.3           | No   |      | OK    | Ok   | TTD |                                         |
+| event_base_new                 | Yes | event_base_new.3           | No   |      | OK    | Ok   | RDY |                                         |
+| event_init                     | Yes | event_base_new.3           | No   |      | OK    | Ok   | RDY |                                         |
+| event_reinit                   | Yes | event_base_new.3           | No   |      | OK    | Ok   | RDY |                                         |
+| event_base_free                | Yes | event_base_new.3           | No   |      | OK    | Ok   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_set_log_callback         | Yes | event_set_log_callback.3   | No   |      | OK    | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
