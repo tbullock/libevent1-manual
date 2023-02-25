@@ -102,7 +102,7 @@ If
 .Fa base
 is not
 .Dv NULL
-it must be a pointer returned by an earlier call to
+it is a pointer returned by an earlier call to
 .Fn event_base_new
 or
 .Fn event_init .
@@ -110,19 +110,19 @@ If
 .Fa base
 is
 .Dv NULL
-and the simplified API was initialized with
+and the library was initialized with
 .Fn event_init ,
 then
 .Fn event_base_free
-will deallocate the internal library variables.
-Otherwise, it will trigger an
+deallocates global library variables.
+Otherwise, it triggers an
 .Xr assert 3
 call.
 .Pp
-Errors and diagnostics from event library functions are reported using
+Errors and diagnostics from many event library functions are reported using
 the log callback mechanism configured through
 .Xr event_set_log_callback 3 .
-In case of an error, the functions will report the problem and then call
+In case of an error, the functions report the problem and then call
 .Xr exit 3
 with a status of 1.
 .Sh RETURN VALUES
@@ -138,7 +138,7 @@ On success,
 returns 0.
 If one or more events fail to reinitialize, the function returns -1.
 .Pp
-Fatal error conditions will
+Fatal error conditions do
 .Em not
 return.
 .Sh ENVIRONMENT
@@ -162,7 +162,7 @@ Disable library support for
 .Xr select 2 .
 .El
 .Pp
-These environment variables will work unless the library detects the program
+These environment variables work unless the library detects the program
 was executed as either setuid or setgid using
 .Xr issetugid 2 .
 The value of the environment variables is ignored, even if their value is
@@ -228,7 +228,7 @@ can report and what they mean:
 Failed to reinitialize the kernel notification method.
 .It Dq event_queue_remove: Em @p Po fd Em @d Pc not on queue Em @x
 Failed to clear an event queue.
-The message format will be populated as follows:
+The message format is populated as follows:
 .Bl -hyphen -compact -width 1n
 .It
 .Em @p :
@@ -245,21 +245,6 @@ Encountered an unknown queue number, indicated by
 .Em @q
 in hexadecimal format.
 .El
-.Pp
-.Sy Diagnostic
-message that
-.Fn event_base_free
-can report and what it means:
-.Bl -tag -width Ds
-.It Dq event_base_free: Em @num No events were still set in Va base
-If the event library is compiled with
-.Dv USE_DEBUG
-defined, this reports that the
-.Vt event_base
-structure was freed with
-.Em @num
-events still scheduled.
-.El
 .Sh ERRORS
 The event library usually does not set
 .Xr errno 2 ,
@@ -271,32 +256,29 @@ issue messages via callbacks which is configured with
 .Xr kqueue 2 ,
 .Xr poll 2 ,
 .Xr select 2 ,
-.Xr event_set_log_callback 3 ,
-.Xr event_base_loop 3
+.Xr event_base_loop 3 ,
+.Xr event_set_log_callback 3
 .Sh HISTORY
-The function
-.Fn event_init
-first appeared in libevent-0.1 and was first added to
-.Ox 3.2 .
-The current protoype and
-.Fn event_base_new
-was used since libevent-1.4.3 and added to
-.Ox 4.4 .
+The
+.Ox
+event library is a modified version of libevent-1.4.
 .Pp
 The function
+.Fn event_init
+first appeared in libevent-0.1 and has been available since
+.Ox 3.2 .
+.Fn event_base_new
+and
 .Fn event_reinit
-was first released in libevent-1.4.3 and included in
+first appeared in libevent-1.4.1 and has been available since
 .Ox 4.8 .
 .Pp
 Support for environment variables first appeared in libevent-0.7a and
 .Ox 3.6 .
 .Sh AUTHORS
-The event library
-was written by
+The event library and these functions were written by
 .An -nosplit
-.An Niels Provos
-and
-.An Nick Mathewson .
+.An Niels Provos .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
@@ -309,3 +291,16 @@ The simplified API that is initialized by using
 instead of
 .Fn event_base_new
 is not thread safe.
+.Pp
+Invoking most functions documented in the event library to require
+.Fn event_init
+without first calling
+.Fn event_init
+causes the program to crash and generate a segmentation fault.
+.Pp
+Those functions also segfault if invoked after
+.Fn event_base_free
+destroys the
+.Fa event_base
+structure initialized by
+.Fn event_init .
