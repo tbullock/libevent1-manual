@@ -21,7 +21,7 @@
 .Nm event_base_loopexit ,
 .Nm event_loopbreak ,
 .Nm event_loopexit
-.Nd schedule an event loop to terminate
+.Nd schedule termination of an event loop
 .Sh SYNOPSIS
 .In event.h
 .Ft int
@@ -31,19 +31,14 @@
 .Ft int
 .Fn event_loopbreak void
 .Ft int
-.Fn event_loopexit void
+.Fn event_loopexit "const struct timeval *tv"
 .Sh DESCRIPTION
-The event library normally stops an event loop when no scheduled events remain
-left to process.
-Programs may need to terminate an event loop early for a variety
-of reasons such as received signals, failed connections, timeouts or other
-user-defined behavior.
+These functions terminate an event loop early even if it would normally
+continue waiting for scheduled events.
 .Pp
-Programs wanting to terminate an event loop immediately can call
-.Fn event_base_loopbreak .
-This function is intended to be called from within a user-defined event
-callback where it instructs the event loop to terminate after the callback
-has been processed.
+.Fn event_base_loopbreak
+is intended to be called from within a user-defined event callback where it
+instructs the event loop to terminate after the callback completes.
 The argument
 .Va base
 is a pointer to an
@@ -56,33 +51,34 @@ is
 .Dv NULL
 the function will fail.
 .Pp
-Programs can use
 .Fn event_base_loopexit
-to schedule the event loop to terminate after a certain amount of time has
-passed.
-This function schedules a timeout event that, when triggered, instructs the
-event loop to return after processing the current pending event queue.
-The timeout event is configured with the default queue number; for further
-information see
+schedules a timeout event that is triggered when
+.Fa tv
+time has passed and then exits the event loop after all pending events with
+the default queue number have been processed.
+For further information on queue numbers see
 .Xr event_base_priority_init 3 .
 The function will fail if it is unable to configure the timeout event.
-The arguments are as follows:
-.Bl -tag -width Ds
-.It Va base :
-A pointer to an
+.Pp
+The argument
+.Fa base
+is a pointer to an
 .Vt event_base
 structure configured by
-.Xr event_base_set 3 .
+.Xr event_base_new 3 .
 The behavior is undefined if
 .Va base
 is
 .Dv NULL .
-.It Va tv :
-A pointer to a populated
+.Fa tv
+is a pointer to a populated
 .Vt timeval
 structure representing the amount of time until the timeout expires.
-Negative timeout values will expire the event upon processing.
-.El
+If
+.Va tv
+is
+.Dv NULL
+or negative, the timeout will expire immediately upon starting the event loop.
 .Pp
 .Fn event_loopbreak
 has equivalent behavior to
@@ -96,40 +92,40 @@ Likewise,
 is equivalent to
 .Fn event_base_loopexit .
 .Sh RETURN VALUES
-.Fn event_base_loopbreak ,
-.Fn event_base_loopexit ,
-.Fn event_loopbreak ,
-and
-.Fn event_loopexit
-return the value 0 if successful; otherwise the value \-1 is returned.
+These functions return 0 on success or \-1 on failure.
 .Sh SEE ALSO
 .Xr event_base_loop 3 ,
 .Xr event_base_priority_init 3 ,
 .Xr event_pending 3
 .Sh HISTORY
-This manual is for libevent-1.4, with local changes for
-.Ox .
-.Bl -bullet -width Ds
-.It
+.Pp
 .Fn event_loopexit
-was added to libevent-0.8 and
+first appeared in libevent-0.8 and has been available since
+.Ox 3.6 .
+.Pp
 .Fn event_base_loopexit
-in libevent-1.0c; both were included in
+first appeared in libevent-1.0c and has been available since
 .Ox 3.8 .
-.It
-.Fn event_base_loopbreak
-and
+.Pp
 .Fn event_loopbreak
-were released in libevent-1.4.3-stable and appeared in
+and
+.Fn event_base_loopbreak
+first appeared in libevent-1.4.1 and have been available since
 .Ox 4.8 .
 .El
 .Sh AUTHORS
-The event library
-was written by
-.An -nosplit
+.Fn event_loopexit
+and
+.Fn event_base_loopexit
+were written by
 .An Niels Provos
 and
-.An Nick Mathewson .
+.Fn event_loopbreak
+and
+.Fn event_base_loopbreak
+by
+.An -nosplit
+.An Scott Lamb .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
