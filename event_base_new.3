@@ -47,18 +47,17 @@ Kernel notification methods are ways for a program to be notified of
 events that occur in the operating system's kernel.
 Examples of such events include changes to file descriptors, file I/O
 operations or network activity.
-There are different ways for applications to be notified of these events,
-such as through the use of system calls like
+The library chooses from several methods to notify programs about events.
+Each method is implemented using a system call, including
 .Xr kqueue 2 ,
 .Xr poll 2 ,
-and
-.Xr select 2 ;
-on
+or
+.Xr select 2 .
+By default,
 .Ox
-this defaults to
-.Xr kqueue 2 .
-These methods are used by the event library to efficiently monitor events and
-notify programs when they occur.
+uses the
+.Xr kqueue 2
+method.
 .Pp
 Environment variables can modify the behavior of
 .Fn event_base_new
@@ -69,10 +68,14 @@ For a complete list of environment variables refer to
 .Pp
 The function
 .Fn event_init
-is a simplified version of
+is a version of
 .Fn event_base_new
-that sets internal global variables and is designed for programs that use only
-one event loop.
+that sets internal global variables and can support one event loop.
+Invoking most functions documented in the event library to require
+.Fn event_init
+without first calling
+.Fn event_init
+generates a segmentation fault.
 .Pp
 After calling
 .Xr fork 2 ,
@@ -84,7 +87,7 @@ the kernel notification method in the
 structure of the child process.
 The function takes a single argument, a pointer to an
 .Vt event_base
-structure initialized by
+structure returned by
 .Fn event_init
 or
 .Fn event_base_new .
@@ -114,10 +117,20 @@ and the library was initialized with
 .Fn event_init ,
 then
 .Fn event_base_free
-deallocates global library variables.
+deallocates internal global library variables.
 Otherwise, it triggers an
 .Xr assert 3
 call.
+.Pp
+Functions documented to require
+.Fn event_init
+generate a segmentation fault if invoked after
+.Fn event_base_free
+destroys the internal global variables initialized by
+.Fn event_init .
+There is no API to restore these internal global variables to their default
+state once they are configured with
+.Fn event_init .
 .Pp
 Errors and diagnostics from many event library functions are reported using
 the log callback mechanism configured through
@@ -292,16 +305,3 @@ The simplified API that is initialized by using
 instead of
 .Fn event_base_new
 is not thread safe.
-.Pp
-Invoking most functions documented in the event library to require
-.Fn event_init
-without first calling
-.Fn event_init
-causes the program to crash and generate a segmentation fault.
-.Pp
-Those functions also segfault if invoked after
-.Fn event_base_free
-destroys the
-.Fa event_base
-structure initialized by
-.Fn event_init .
