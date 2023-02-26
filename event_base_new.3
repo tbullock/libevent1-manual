@@ -133,7 +133,7 @@ state once they are configured with
 .Fn event_init .
 .Pp
 Errors and diagnostics from many event library functions are reported using
-the log callback mechanism configured through
+the log callback system configured with
 .Xr event_set_log_callback 3 .
 In case of an error, the functions report the problem and then call
 .Xr exit 3
