@@ -27,26 +27,26 @@ Ted: TTD; has internal list of things to adjust
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_set_log_callback         | Yes | event_set_log_callback.3   | No   |      | OK    | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_base_loop                | Yes | event_base_loop.3          | No   |      |       |      | TTD | Rewrite History                         |
-| event_loop                     | Yes | event_base_loop.3          | No   |      |       |      | TTD |                                         |
-| event_base_dispatch            | Yes | event_base_loop.3          | No   |      |       |      | TTD |                                         |
-| event_dispatch                 | Yes | event_base_loop.3          | No   |      |       |      | TTD |                                         |
+| event_base_loop                | Yes | event_base_loop.3          | No   |      | RA    | RA   | RDY |                                         |
+| event_loop                     | Yes | event_base_loop.3          | No   |      | RA    | RA   | RDY |                                         |
+| event_base_dispatch            | Yes | event_base_loop.3          | No   |      | RA    | RA   | RDY |                                         |
+| event_dispatch                 | Yes | event_base_loop.3          | No   |      | RA    | RA   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_set                      | Yes | event_set.3                | No   |      | OK    | OK   | TTD | Rewrite History                         |
+| event_set                      | Yes | event_set.3                | No   |      | OK    | OK   | TTD | Verify History section                  |
 | event_base_set                 | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
 | event_add                      | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
 | event_del                      | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
 | event_base_once                | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
 | event_once                     | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_active                   | Yes | event_active.3             | No   |      |       |      | TTD | Rewrite History                         |
+| event_active                   | Yes | event_active.3             | No   |      |       |      | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_pending                  | Yes | event_pending.3            | No   |      |       |      | TTD | Rewrite History                         |
-| event_initialized              | Yes | event_pending.3            | No   |      |       |      | TTD | Rewrite History                         |
+| event_pending                  | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
+| event_initialized              | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_base_get_method          | Yes | event_base_get_method.3    | No   |      |       |      | TTD | Rewrite History                         |
-| event_get_method               | Yes | event_base_get_method.3    | No   |      |       |      | TTD |                                         |
-| event_get_version              | Yes | event_base_get_method.3    | No   |      |       |      | TTD |                                         |
+| event_base_get_method          | Yes | event_base_get_method.3    | No   |      |       | OK   | TTD | Verify History section                  |
+| event_get_method               | Yes | event_base_get_method.3    | No   |      |       | OK   | TTD |                                         |
+| event_get_version              | Yes | event_base_get_method.3    | No   |      |       | OK   | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_err                      | No  |                            |      |      |       |      |     |                                         |
 | event_errx                     | No  |                            |      |      |       |      |     |                                         |
@@ -62,17 +62,17 @@ Ted: TTD; has internal list of things to adjust
 | evutil_strtoll                 | No  |                            |      |      |       |      |     |                                         |
 | evutil_vsnprintf               | No  |                            |      |      |       |      |     |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| signal_set                     | Yes | event_set.3                | No   |      |       |      | TTD |                                         |
-| signal_add                     | Yes | event_set.3                | No   |      |       |      | TTD |                                         |
-| signal_del                     | Yes | event_set.3                | No   |      |       |      | TTD |                                         |
-| signal_pending                 | Yes | event_pending.3            | No   |      |       |      | TTD |                                         |
-| signal_initialized             | Yes | event_pending.3            | No   |      |       |      | TTD |                                         |
+| signal_set                     | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
+| signal_add                     | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
+| signal_del                     | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
+| signal_pending                 | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
+| signal_initialized             | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| evtimer_set                    | Yes | event_set.3                | No   |      |       |      | TTD |                                         |
-| evtimer_add                    | Yes | event_set.3                | No   |      |       |      | TTD |                                         |
-| evtimer_del                    | Yes | event_set.3                | No   |      |       |      | TTD |                                         |
-| evtimer_pending                | Yes | event_pending.3            | No   |      |       |      | TTD |                                         |
-| evtimer_initialized            | Yes | event_pending.3            | No   |      |       |      | TTD |                                         |
+| evtimer_set                    | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
+| evtimer_add                    | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
+| evtimer_del                    | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
+| evtimer_pending                | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
+| evtimer_initialized            | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | bufferevent_base_set           | Yes |                            | No   |      |       |      |     |                                         |
 | bufferevent_disable            | Yes |                            | No   |      |       |      |     |                                         |
@@ -99,7 +99,7 @@ Ted: TTD; has internal list of things to adjust
 | evbuffer_expand                | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_find                  | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_free                  | Yes | evbuffer_new.3             | No   |      |       |      | TTD |                                         |
-| evbuffer_new                   | Yes | evbuffer_new.3             | No   |      |       |      | TTD |  Rewrite History                        |
+| evbuffer_new                   | Yes | evbuffer_new.3             | No   |      |       |      | TTD | Verify History section                  |
 | evbuffer_read                  | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_readline              | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_readln                | Yes |                            | No   |      |       |      |     |                                         |
@@ -110,14 +110,14 @@ Ted: TTD; has internal list of things to adjust
 | event_asr_abort                | Yes |                            | No   |      |       |      |     |                                         |
 | event_asr_run                  | Yes |                            | No   |      |       |      |     |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_base_loopbreak           | Yes | event_base_loopbreak.3     | No   |      |       |      | TTD | Rewrite History                         |
+| event_base_loopbreak           | Yes | event_base_loopbreak.3     | No   |      |       |      | TTD | Moderate adjustments from Ingo          |
 | event_base_loopexit            | Yes | event_base_loopbreak.3     | No   |      |       |      | TTD |                                         |
 | event_loopbreak                | Yes | event_base_loopbreak.3     | No   |      |       |      | TTD |                                         |
 | event_loopexit                 | Yes | event_base_loopbreak.3     | No   |      |       |      | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_priority_init            | Yes | event_base_priority_init.3 | No   |      |       |      | TTD | Rewrite History                         |
-| event_priority_set             | Yes | event_base_priority_init.3 | No   |      |       |      | TTD |                                         |
-| event_base_priority_init       | Yes | event_base_priority_init.3 | No   |      |       |      | TTD |                                         |
+| event_priority_init            | Yes | event_base_priority_init.3 | No   |      |       | OK   | TTD | Verify History secion                   |
+| event_priority_set             | Yes | event_base_priority_init.3 | No   |      |       | OK   | TTD |                                         |
+| event_base_priority_init       | Yes | event_base_priority_init.3 | No   |      |       | OK   | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | evsignal_add                   | Yes |                            | No   |      |       |      |     |                                         |
 | evsignal_dealloc               | Yes |                            | No   |      |       |      |     |                                         |
