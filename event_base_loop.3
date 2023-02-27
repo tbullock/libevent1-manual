@@ -32,14 +32,27 @@
 .Fn event_base_dispatch "struct event_base *base"
 .Ft int
 .Fn event_dispatch void
+.Fd #define EVLOOP_ONCE		0x01
+.Fd #define EVLOOP_NONBLOCK	0x02
 .Sh DESCRIPTION
-These functions run an event loop that replaces the main loop of a program and
-waits for events to occur before executing corresponding callback functions.
-By default, they return when there are no more events to monitor.
+An event loop waits for and dispatches events or messages in a program.
+This enables asynchronous programming, allowing a program to perform other
+tasks while waiting for an event to occur.
+Asynchronous programming is a useful idiom for handling multiple I/O
+operations, such as network connections, user interfaces, or disk operations
+without blocking the main loop of a program.
+The event loop continuously processes events and executes callbacks associated
+with each event as they occur.
 .Pp
-There are three types of events these functions will monitor including signal,
+The
+.Fn event_base_loop
+family of functions start an event loop that replaces the main loop of a
+program.
+By default, they return when there are no more scheduled events.
+.Pp
+There are three types of events these functions monitor including signal,
 kernel and timer.
-POSIX signals are configured using
+Events involving POSIX signals are configured with
 .Xr signal_set 3 .
 Kernel events such as network activity and changes to file descriptors are
 configured with
@@ -47,19 +60,38 @@ configured with
 Timer events are configured with
 .Xr evtimer_set 3 .
 .Pp
+The event library further categorizes events as:
+.Bl -tag -width "Initialized:"
+.It Sy Initialized :
+These have been configured with
+.Xr event_set 3
+but not yet registered with an event loop.
+.It Sy Scheduled :
+These are registered to a loop using
+.Xr event_add 3
+and are idle, waiting to trigger and be processed by the loop.
+.It Sy Pending :
+These are triggered events that can be queried with
+.Fn event_pending 3 .
+The loop processes events until all pending events are handled, some of these
+such as signals, may persist and become scheduled events again.
+.El
+.Pp
 .Fn event_base_loop
-takes two arguments:
-.Bl -tag -width Ds
-.It Va base :
+starts an event loop, it takes two arguments:
+.Bl -tag -width 6n
+.It Fa base :
 A pointer to an
 .Vt event_base
-structure initialized by
+structure returned from
+.Xr event_init 3
+or
 .Xr event_base_new 3 .
 The behavior is undefined if
-.Va base
+.Fa base
 is
 .Dv NULL .
-.It Va flags :
+.It Fa flags :
 A set of flags that modify the behavior of the event loop.
 The following flags are available:
 .Pp
@@ -72,8 +104,8 @@ the event loop.
 .It
 .Dv EVLOOP_NONBLOCK :
 Run the event loop in non-blocking mode.
-In this mode, the function will return after processing signal and active
-kernel events but will not wait for timer events to expire.
+The loop returns after processing pending signal and kernel events but does
+not wait for timer events to expire.
 .El
 .El
 .Pp
@@ -84,19 +116,23 @@ is a version of
 that requires the library to be initialized by
 .Xr event_init 3 .
 The function has one argument,
-.Va flags ,
+.Fa flags ,
 with the same attributes as
 .Fn event_base_loop .
 .Pp
 .Fn event_base_dispatch
 is equivalent to calling
 .Fn event_base_loop
-with flags of zero.
+with
+.Fa flags
+set to zero.
 Likewise,
 .Fn event_dispatch
-is the same as
+is the same as invoking
 .Fn event_loop
-with flags of zero.
+with
+.Fa flags
+set to zero.
 .Sh RETURN VALUES
 The event loop functions return:
 .Pp
@@ -104,57 +140,31 @@ The event loop functions return:
 .It \-1
 on error,
 .Va errno
-will be set.
+is set.
 .It 0
 on success, asked to terminate loop.
 .It 1
 on success, no remaining events left or scheduled in queue.
 .El
-.Sh DIAGNOSTICS
-The event library relies on its own system to issue messages via
-.Xr event_set_log_callback 3 .
-.Pp
-.Sy Debug
-messages that the
-.Fn event_base_loop
-event loop functions can report and what they mean:
-.Bl -tag -width Ds
-.It Dq event_base_loop: asked to terminate loop.
-Function returned because program logic instructed it to.
-This corresponds to return value 0.
-.It Dq event_base_loop: no events registered.
-No events were registered or all events have been cleared.
-This corresponds to return value 1.
-.El
-.Pp
-.Em NOTE
-that internally, the event library generates debug messages throughout its
-callgraph, especially in the event loop.
-Warnings from failed system calls will reflect the kernel notification method
-and report
-.Va errno
-values in their message text.
 .Sh ERRORS
 These functions have complex interactions with
 .Va errno .
-The
-.Fn event_base_loop
-family of functions sets
+Error conditions that set
 .Va errno
-corresponding to the kernel notification method the event library is
+change corresponding to the kernel notification method the event library is
 using.
-These values will directly correspond to
+These values directly correspond to
 .Xr kevent 2 ,
 .Xr poll 2
 or
 .Xr select 2
-system calls; on
-.Ox
-this defaults to
-.Xr kevent 2 .
-See
+system calls and default to
+.Xr kevent 2
+on
+.Ox .
+Refer to
 .Xr event_base_new 3
-for details on selecting kernel notification methods.
+for details on kernel notification methods.
 .Bl -tag -width Er
 .It Bq Er EINTR
 Although the kernel notification methods can set
@@ -162,7 +172,7 @@ Although the kernel notification methods can set
 to
 .Er EINTR ,
 .Fn event_base_loop
-and related functions will never fail with
+and related functions never fail with
 .Va errno
 set to
 .Er EINTR .
@@ -173,31 +183,23 @@ set to
 .Xr select 2 ,
 .Xr event_base_new 3
 .Sh HISTORY
-This manual is for libevent-1.4, with local changes for
-.Ox .
-.Bl -bullet -width Ds
-.It
 .Fn event_dispatch
-was first introduced in libevent-0.1, and added to
+first appeared in libevent-0.1 and has been available since
 .Ox 3.2 .
-.It
+.Pp
 .Fn event_loop
-was introduced in libevent-0.4, and added to
+first appeared in libevent-0.4 and has been available since
 .Ox 3.2 .
-.It
+.Pp
 .Fn event_base_dispatch
 and
 .Fn event_base_loop
-were added in libevent-1.0, and appeared in
+first appeared in libevent-1.0 and has been available since
 .Ox 3.8 .
-.El
 .Sh AUTHORS
-The event library
-was written by
+The event library and these functions were written by
 .An -nosplit
-.An Niels Provos
-and
-.An Nick Mathewson .
+.An Niels Provos .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
