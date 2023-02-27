@@ -75,15 +75,6 @@
 .Fd #define EV_SIGNAL	0x08
 .Fd #define EV_PERSIST	0x10
 .Sh DESCRIPTION
-An event loop waits for and dispatches events or messages in a program.
-This enables asynchronous programming, allowing a program to perform other
-tasks while waiting for an event to occur.
-Asynchronous programming is a useful idiom for handling multiple I/O
-operations, such as network connections, user interfaces, or disk operations
-without blocking the main loop of a program.
-The event loop continuously processes events and executes callbacks associated
-with each event.
-.Pp
 The
 .Fn event_set
 function prepares an
