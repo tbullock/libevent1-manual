@@ -33,7 +33,7 @@ Programs may occasionally need to manually trigger events with user-defined
 behavior.
 This is accomplished with the
 .Fn event_active
-function which signals an event loop to process the event and invoke the
+function, which signals an event loop to process the event and invoke the
 event callback
 .Fa ncalls
 number of times in a row.
@@ -42,7 +42,7 @@ The arguments are as follows:
 .It Fa ev :
 A pointer to the
 .Vt event
-to be triggered, if
+to be triggered; if
 .Fa ev
 is
 .Dv NULL
