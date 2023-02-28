@@ -81,11 +81,11 @@ function prepares an
 .Vt event
 structure to monitor a file descriptor or signal for use with an event loop.
 Once prepared, the
-.Va event
-structure can be scheduled with an event loop using
+.Vt event
+can be scheduled with a loop using
 .Fn event_add
 to monitor for changes or set a timeout after which a user-defined callback
-function will be executed.
+function is executed.
 Refer to
 .Xr event_base_loop 3
 for documentation on running an event loop.
@@ -95,10 +95,11 @@ Arguments for
 are as follows:
 .Bl -tag -width 7n
 .It Va ev :
-A pointer to a
-.Vt "struct event" .
+A pointer to an
+.Vt "event" 
+structure.
 If
-.Va ev
+.Fa ev
 is
 .Dv NULL
 the behavior is undefined.
@@ -192,9 +193,9 @@ structure, and the second argument is the
 to be reassigned.
 The behavior is undefined if either argument is
 .Dv NULL .
-Only events that have not been processed with
+Only events that have not been scheduled with
 .Fn event_add
-or equivalent functions can be assigned to a new
+or corresponding helper macros or functions can be assigned to a new
 .Vt event_base
 structure.
 .Pp
@@ -202,34 +203,34 @@ structure.
 schedules events with an event loop using the appropriate kernel notification
 method
 (See
-.Fn event_base_new
+.Xr event_base_new 3
 for an explanation about kernel notification methods).
 If a timeout is specified, it is added to the event timeout list.
 Events can register as timeout events without attaching to file
 descriptors or signals.
 Programs can set the
-.Va tv
+.Fa tv
 argument to
 .Dv NULL
 to specify an event has no timeout.
 The behavior is undefined if
-.Va ev
+.Fa ev
 is
 .Dv NULL .
 The helper macros
 .Fn evtimer_add
 and
 .Fn signal_add
-are equivalent to
+correspond to
 .Fn event_add .
 .Pp
 .Fn event_del
 removes an event from an event loop.
 To remove an event, pass a pointer to the event scheduled for removal as the
-.Va ev
+.Fa ev
 argument.
 The behavior of the function is undefined if
-.Va ev
+.Fa ev
 is
 .Dv NULL .
 On success, it removes the event from internal event queues and unregisters it
@@ -246,7 +247,7 @@ The helper macros
 .Fn evtimer_del
 and
 .Fn signal_del
-are equivalent to
+correspond to
 .Fn event_del .
 .Pp
 .Fn event_base_once
@@ -262,7 +263,7 @@ A pointer to an
 structure initialized by
 .Xr event_base_new 3 .
 The behavior is undefined if
-.Va base
+.Fa base
 is
 .Dv NULL .
 .It Va fd :
@@ -289,12 +290,10 @@ to ignore.
 .El
 .Pp
 .Fn event_once
-is equivalent to
+is similar to
 .Fn event_base_once
 but requires that the library is initialized with
-.Xr event_init 3
-and removes the argument
-.Va base .
+.Xr event_init 3 .
 .Pp
 To check the status of a scheduled event, refer to the
 .Xr event_pending 3
@@ -302,27 +301,22 @@ manual page.
 If a program needs to manually trigger an event, refer to
 .Xr event_active 3 .
 .Sh RETURN VALUES
+These functions return 0 on success or \-1 on failure.
+.Pp
 .Fn event_base_set
-returns 0 on success or returns \-1 if the event being reassigned has already
+returns \-1 if the event being reassigned has already
 been processed by
 .Fn event_add
-or is not in an initialized state.
+or is not initialized.
 .Pp
 .Fn event_add
-returns 0 on success and \-1 on failure.
-If a memory allocation fault occurs errno will be set; other errors will cause
-the function to report the error via the log callback set with
-.Xr event_set_log_callback 3
-and then terminate the program with
-.Xr exit 3 .
-.Pp
-.Fn event_del
-returns 0 on success and \-1 on failure.
-.Pp
-.Fn event_base_once
-and
-.Fn event_once
-return 0 if successful and \-1 on failure.
+returns \-1 if a memory allocation fault occurs
+.Va errno
+is set.
+Other internal library errors terminate the program with
+.Xr exit 3
+after reporting to the log callback (see
+.Xr event_set_log_callback 3 ) .
 .Sh ERRORS
 On failure
 .Fn event_add
@@ -338,39 +332,34 @@ System has insufficient memory to add the event to the event loop.
 .Xr event_base_new 3 ,
 .Xr event_pending 3
 .Sh HISTORY
-This manual is for libevent-1.4, with local changes for
-.Ox .
-.Bl -bullet -width Ds
-.It
 .Fn event_set ,
-.Fn event_add ,
+.Fn event_add
 and
 .Fn event_del
-were added in libevent-0.1 and appeared in
+first appeared in libevent-0.1 and have been available since
 .Ox 3.2 .
-.It
+.Pp
 .Fn event_base_set
-was introduced in libevent-1.0 and added to
+first appeared in libevent-1.0 and has been available since
 .Ox 3.8 .
-.It
+.Pp
 .Fn event_once
-was added to libevent-0.8 and appeared in
+first appeared in libevent-0.8 and has been available since
 .Ox 3.8 .
-.It
+.Pp
 .Fn event_base_once
-appeared first in libevent-1.3c and included in
+first appeared in libevent-1.3c and has been available since
 .Ox 4.4 .
-.It
-The helper macros were added to libevent-0.6 and added to
+.Pp
+The helper macros first appeared in libevent-0.6 and have been available since
 .Ox 3.2 .
-.El
 .Sh AUTHORS
-The event library
-was written by
 .An -nosplit
 .An Niels Provos
-and
-.An Nick Mathewson .
+wrote the event library and these functions except for
+.Fn event_base_once
+which was also created by
+.An Wouter Wijngaards .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
