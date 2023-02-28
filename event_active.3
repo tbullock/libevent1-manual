@@ -14,7 +14,7 @@
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
 .Dd $Mdocdate$
-.Dt event_active 3
+.Dt EVENT_ACTIVE 3
 .Os
 .Sh NAME
 .Nm event_active
@@ -23,51 +23,78 @@
 .In event.h
 .Ft void
 .Fn event_active "struct event *ev" "int res" "short ncalls"
+.Fd #define EV_TIMEOUT	0x01
+.Fd #define EV_READ	0x02
+.Fd #define EV_WRITE	0x04
+.Fd #define EV_SIGNAL	0x08
+.Fd #define EV_PERSIST	0x10
 .Sh DESCRIPTION
-Programs may need to manually trigger events with user-defined behavior.
+Programs may occasionally need to manually trigger events with user-defined
+behavior.
 This is accomplished with the
 .Fn event_active
-function.
+function which signals an event loop to process the event and invoke the
+event callback
+.Fa ncalls
+number of times in a row.
 The arguments are as follows:
 .Bl -tag -width "ncalls:"
-.It Va ev :
-A pointer to the event to be triggered, if
-.Va ev
+.It Fa ev :
+A pointer to the
+.Vt event
+to be triggered, if
+.Fa ev
 is
 .Dv NULL
 the behavior is undefined.
-.It Va res :
-A bitmask specifying which event types should be activated
-.Po
+.It Fa res :
+A bitmask specifying which event flags to activate.
 .Dv EV_TIMEOUT ,
 .Dv EV_READ ,
 .Dv EV_WRITE ,
-.Dv EV_READ
-or
-.Dv EV_SIGNAL
-.Pc .
-.It Va ncalls :
+.Dv EV_SIGNAL ,
+and
+.Dv EV_PERSIST
+are valid flags consistent with event library semantics.
+Other flags may produce undefined behavior or be ignored by library functions.
+Refer to
+.Xr event_set 3
+for a detailed explanation of event flags.
+.It Fa ncalls :
 The number of times the callback function should be executed.
 The behavior is undefined if
-.Va ncalls
+.Fa ncalls
 is negative or zero.
-.Pp
-If the event has already been triggered but has not yet been processed by the
-event loop, this function will have no effect.
 .El
+.Pp
+This function updates the event flags on pending events but otherwise makes
+no other changes
+.Pq see Xr event_pending 3 .
+.Pp
+.Fn event_active
+causes a segmentation fault if executed without previously invoking at least
+.Xr event_set 3 .
+.Xr event_base_set 3
+is
+.Em also
+required for programs initialized with
+.Xr event_base_new 3 .
+.Pp
+The function preserves an events queue number configured with
+.Xr event_priority_set 3 .
+The event is processed consistent with the priority promise of that queue.
 .Sh SEE ALSO
+.Xr event_base_new 3 ,
+.Xr event_priority_set 3 ,
 .Xr event_set 3
 .Sh HISTORY
 .Fn event_active
-was first released in libevent-0.4 and included in
+first appeared in libevent-0.4 and has been available since
 .Ox 3.2 .
 .Sh AUTHORS
-The event library
-was written by
+The event library and this function was written by
 .An -nosplit
-.An Niels Provos
-and
-.An Nick Mathewson .
+.An Niels Provos .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
