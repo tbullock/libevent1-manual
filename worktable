@@ -32,12 +32,12 @@ Ted: TTD; has internal list of things to adjust
 | event_base_dispatch            | Yes | event_base_loop.3          | No   |      | RA    | RA   | RDY |                                         |
 | event_dispatch                 | Yes | event_base_loop.3          | No   |      | RA    | RA   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_set                      | Yes | event_set.3                | No   |      | OK    | OK   | TTD | Verify History section                  |
-| event_base_set                 | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
-| event_add                      | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
-| event_del                      | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
-| event_base_once                | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
-| event_once                     | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
+| event_set                      | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
+| event_base_set                 | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
+| event_add                      | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
+| event_del                      | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
+| event_base_once                | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
+| event_once                     | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_active                   | Yes | event_active.3             | No   |      |       |      | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
