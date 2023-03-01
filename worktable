@@ -39,7 +39,7 @@ Ted: TTD; has internal list of things to adjust
 | event_base_once                | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
 | event_once                     | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_active                   | Yes | event_active.3             | No   |      |       |      | TTD |                                         |
+| event_active                   | Yes | event_active.3             | No   |      | OK    |      | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_pending                  | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
 | event_initialized              | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
@@ -62,15 +62,15 @@ Ted: TTD; has internal list of things to adjust
 | evutil_strtoll                 | No  |                            |      |      |       |      |     |                                         |
 | evutil_vsnprintf               | No  |                            |      |      |       |      |     |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| signal_set                     | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
-| signal_add                     | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
-| signal_del                     | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
+| signal_set                     | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
+| signal_add                     | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
+| signal_del                     | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
 | signal_pending                 | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
 | signal_initialized             | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| evtimer_set                    | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
-| evtimer_add                    | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
-| evtimer_del                    | Yes | event_set.3                | No   |      | OK    | OK   | TTD |                                         |
+| evtimer_set                    | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
+| evtimer_add                    | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
+| evtimer_del                    | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
 | evtimer_pending                | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
 | evtimer_initialized            | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
