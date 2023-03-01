@@ -40,24 +40,39 @@
 .Fd #define EV_WRITE	0x04
 .Fd #define EV_SIGNAL	0x08
 .Sh DESCRIPTION
-Once an event has been scheduled with a running event loop, it is possible to
-query its status using
+It is possible to query whether an event is
+.Sy scheduled
+with an event loop using
 .Fn event_pending .
-This function checks whether an event is currently pending or scheduled and,
-if it has a timeout, how long until that expires.
+.Pp
 An event is considered
-.Dq pending
-if one or more of the
-.Va event
-flags is currently triggered for the event.
-The arguments are as follows:
+.Sy scheduled
+if any these conditions are true:
+.Bl -bullet -width Ds
+.It
+A file descriptor or signal was configured with
+.Xr event_set 3
+and then registered with
+.Xr event_add 3 .
+.It
+An expiration timeout was configured.
+.It
+The event is
+.Sy activated
+and awaiting processing.
+.El
+.Pp
+This function checks whether an event was configured with
+.Xr event_add 3
+and, if it has a timeout, how long until that expires.
+The arguments of
+.Fn event_pending
+are as follows:
 .Bl -tag -width Ds
 .It Va ev :
-A pointer to the event being queried.
-The event
-.Va ev
-must have been scheduled with
-.Fn event_add .
+A pointer to the
+.Vt event
+structure being queried.
 The behavior is undefined if
 .Va ev
 is
@@ -80,6 +95,15 @@ the function will calculate the time remaining until the timeout occurs and
 store it in
 .Va tv .
 .El
+.Pp
+.Fn event_pending
+causes a segmentation fault if executed without previously invoking at least
+.Xr event_set 3 .
+.Xr event_base_set 3
+is
+.Em also
+required for programs initialized with
+.Xr event_base_new 3 .
 .Pp
 Helper macros make it easier to query a timeout or signal event.
 The argument
@@ -112,9 +136,10 @@ The macros
 .Fn evtimer_initialized
 and
 .Fn signal_initialized
-evaluate to a value indicating whether the event has been added to the event
-loop with
-.Xr event_add 3
+evaluate to a non-zero value indicating whether the event was
+.Sy initialized
+with
+.Xr event_set 3
 or not.
 The behavior is undefined if
 .Va ev
@@ -122,30 +147,30 @@ is
 .Dv NULL .
 .Sh RETURN VALUES
 .Fn event_pending
-returns 1 if the event is pending, and 0 if the event is scheduled.
+returns 0 if the event is not
+.Sy scheduled
+or a non-zero bitmap comprised of the queried event flags
+.Pq Dv EV_READ , Dv EV_WRITE , Dv EV_SIGNAL or Dv EV_TIMEOUT
+if it is.
 .Pp
-If the
+The
 .Fn event_initialized
-and related macros evaluate to a non-zero value, this indicates that the event
-is initialized.
-If the macro evaluates as zero, this indicates that the event is not
-initialized.
+and related macros evaluate to 0 if the event is not
+.Sy initialized
+and evaluate to a non-zero value if it is.
 .Sh SEE ALSO
 .Xr event_set 3
 .Sh HISTORY
 .Fn event_pending
-was added in libevent-0.1 and appeared in
+first appeared in libevent-0.1 and has been available since
 .Ox 3.2 .
 .Pp
-The helper macros were added to libevent-0.6 and added to
+The helper macros first appeared in libevent-0.6 and have been available since
 .Ox 3.2 .
 .Sh AUTHORS
-The event library
-was written by
+The event library, this function and set of macros were written by
 .An -nosplit
-.An Niels Provos
-and
-.An Nick Mathewson .
+.An Niels Provos .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
