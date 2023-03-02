@@ -41,8 +41,8 @@ Ted: TTD; has internal list of things to adjust
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_active                   | Yes | event_active.3             | No   |      | OK    |      | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_pending                  | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
-| event_initialized              | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
+| event_pending                  | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
+| event_initialized              | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_base_get_method          | Yes | event_base_get_method.3    | No   |      |       | OK   | TTD | Verify History section                  |
 | event_get_method               | Yes | event_base_get_method.3    | No   |      |       | OK   | TTD |                                         |
@@ -65,14 +65,14 @@ Ted: TTD; has internal list of things to adjust
 | signal_set                     | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
 | signal_add                     | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
 | signal_del                     | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
-| signal_pending                 | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
-| signal_initialized             | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
+| signal_pending                 | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
+| signal_initialized             | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | evtimer_set                    | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
 | evtimer_add                    | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
 | evtimer_del                    | Yes | event_set.3                | No   |      | OK    | OK   | RDY |                                         |
-| evtimer_pending                | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
-| evtimer_initialized            | Yes | event_pending.3            | No   |      |       | OK   | TTD |                                         |
+| evtimer_pending                | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
+| evtimer_initialized            | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | bufferevent_base_set           | Yes |                            | No   |      |       |      |     |                                         |
 | bufferevent_disable            | Yes |                            | No   |      |       |      |     |                                         |
@@ -110,10 +110,10 @@ Ted: TTD; has internal list of things to adjust
 | event_asr_abort                | Yes |                            | No   |      |       |      |     |                                         |
 | event_asr_run                  | Yes |                            | No   |      |       |      |     |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_base_loopbreak           | Yes | event_base_loopbreak.3     | No   |      |       |      | TTD | Moderate adjustments from Ingo          |
-| event_base_loopexit            | Yes | event_base_loopbreak.3     | No   |      |       |      | TTD |                                         |
-| event_loopbreak                | Yes | event_base_loopbreak.3     | No   |      |       |      | TTD |                                         |
-| event_loopexit                 | Yes | event_base_loopbreak.3     | No   |      |       |      | TTD |                                         |
+| event_base_loopbreak           | Yes | event_base_loopbreak.3     | No   |      |       |      | RDY |                                         |
+| event_base_loopexit            | Yes | event_base_loopbreak.3     | No   |      |       |      | RDY |                                         |
+| event_loopbreak                | Yes | event_base_loopbreak.3     | No   |      |       |      | RDY |                                         |
+| event_loopexit                 | Yes | event_base_loopbreak.3     | No   |      |       |      | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_priority_init            | Yes | event_base_priority_init.3 | No   |      |       | OK   | TTD | Verify History secion                   |
 | event_priority_set             | Yes | event_base_priority_init.3 | No   |      |       | OK   | TTD |                                         |
