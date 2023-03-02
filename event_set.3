@@ -79,13 +79,17 @@ The
 .Fn event_set
 function prepares an
 .Vt event
-structure to monitor a file descriptor or signal for use with an event loop.
+structure to monitor a file descriptor or signal.
 Once prepared, the
 .Vt event
-can be scheduled with a loop using
-.Fn event_add
-to monitor for changes or set a timeout after which a user-defined callback
-function is executed.
+can be
+.Sy scheduled
+using
+.Fn event_add .
+The event becomes
+.Sy activated
+and the callback is triggered when the file descriptor state changes or
+timeout expires.
 Refer to
 .Xr event_base_loop 3
 for documentation on running an event loop.
@@ -105,10 +109,10 @@ is
 the behavior is undefined.
 .It Va fd :
 The file descriptor or signal to monitor.
-If this is an unassociated timeout event, set this to \-1.
+Unassociated timeout events require this set to \-1.
 .It Va events :
 Flags indicating how to monitor events.
-If this is an unassociated timeout event, set this to 0.
+Unassociated timeout events require this set to 0.
 .Pp
 .Bl -tag -width "EV_PERSIST:" -compact
 .It Dv EV_READ :
@@ -128,27 +132,31 @@ or
 .Dv EV_WRITE .
 .It Dv EV_PERSIST :
 Indicates that the event should persist after it triggers.
-That is, it should remain active until it is explicitly removed by calling
+That is, it should remain active until it is removed by calling
 .Fn event_del .
-This flag is typically combined with signal events.
+Signal events typically require this flag.
 .El
 .It Va fn :
 A user-defined callback function that is executed when the event triggers.
 .Pp
 .Bl -enum -width Ds -compact
 .It
-The first parameter is an integer representing the file descriptor or signal
-being monitored.
+The first parameter is the file descriptor or signal to monitor.
 .It
-The second parameter is the bitmap corresponding to the type of event,
-matching to EV_TIMEOUT, EV_READ, EV_WRITE, EV_SIGNAL and EV_PERSIST.
+The second parameter is an event flag composed of at least one of
+.Dv EV_TIMEOUT ,
+.Dv EV_READ ,
+.Dv EV_WRITE ,
+.Dv EV_SIGNAL
+and
+.Dv EV_PERSIST
+combined with a binary OR operation.
 .It
-The third parameter corresponds to the user-defined data structure
-passed as a
+The third parameter corresponds to a user-specified pointer passed as a
 .Vt void * .
 .El
 .It Va arg :
-User-defined data structure to pass to the callback function.
+User-specified pointer to pass to the callback function.
 .El
 .Pp
 There are several helper macros that make it easier to set up timeout and
@@ -193,18 +201,18 @@ structure, and the second argument is the
 to be reassigned.
 The behavior is undefined if either argument is
 .Dv NULL .
-Only events that have not been scheduled with
+Only events that have not been
+.Sy scheduled
+with
 .Fn event_add
 or corresponding helper macros or functions can be assigned to a new
 .Vt event_base
 structure.
 .Pp
 .Fn event_add
-schedules events with an event loop using the appropriate kernel notification
-method
-(See
+schedules events using the appropriate kernel notification method (see
 .Xr event_base_new 3
-for an explanation about kernel notification methods).
+for information about kernel notification methods).
 If a timeout is specified, it is added to the event timeout list.
 Events can register as timeout events without attaching to file
 descriptors or signals.
@@ -212,7 +220,7 @@ Programs can set the
 .Fa tv
 argument to
 .Dv NULL
-to specify an event has no timeout.
+to specify that an event has no timeout.
 The behavior is undefined if
 .Fa ev
 is
@@ -226,9 +234,9 @@ correspond to
 .Pp
 .Fn event_del
 removes an event from an event loop.
-To remove an event, pass a pointer to the event scheduled for removal as the
+The
 .Fa ev
-argument.
+argument is the event to remove.
 The behavior of the function is undefined if
 .Fa ev
 is
@@ -251,7 +259,9 @@ correspond to
 .Fn event_del .
 .Pp
 .Fn event_base_once
-is used to schedule a callback function to be executed exactly once without
+is used to
+.Sy schedule
+a callback function to be executed exactly once without
 requiring the caller to create and manage an
 .Vt event
 structure.
@@ -279,14 +289,12 @@ A user-defined callback function that is executed when the event triggers.
 This callback matches the same prototype and design used in
 .Fn event_set .
 .It Va arg :
-A user-defined data structure to pass to the callback function.
+A user-specified pointer to pass to the callback function.
 .It Va tv :
 A pointer to an optional timeout
 .Vt timeval
-structure.
-Set to
-.Dv NULL
-to ignore.
+structure, ignored if
+.Dv NULL .
 .El
 .Pp
 .Fn event_once
@@ -295,7 +303,9 @@ is similar to
 but requires that the library is initialized with
 .Xr event_init 3 .
 .Pp
-To check the status of a scheduled event, refer to the
+To check the status of a
+.Sy scheduled
+event, refer to the
 .Xr event_pending 3
 manual page.
 If a program needs to manually trigger an event, refer to
