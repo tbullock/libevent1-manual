@@ -34,7 +34,9 @@
 .Fn event_loopexit "const struct timeval *tv"
 .Sh DESCRIPTION
 These functions terminate an event loop early even if it would normally
-continue waiting for scheduled events.
+continue waiting for
+.Sy scheduled
+events.
 .Pp
 .Fn event_base_loopbreak
 is intended to be called from within a user-defined event callback where it
@@ -49,16 +51,17 @@ If
 .Va base
 is
 .Dv NULL
-the function will fail.
+the function fails.
 .Pp
 .Fn event_base_loopexit
 schedules a timeout event that is triggered when
 .Fa tv
-time has passed and then exits the event loop after all pending events with
-the default queue number have been processed.
+time has passed and then exits the event loop after all
+.Sy activated
+events with the default queue number have been processed.
 For further information on queue numbers see
 .Xr event_base_priority_init 3 .
-The function will fail if it is unable to configure the timeout event.
+The function fails if it is unable to configure the timeout event.
 .Pp
 The argument
 .Fa base
@@ -78,28 +81,24 @@ If
 .Va tv
 is
 .Dv NULL
-or negative, the timeout will expire immediately upon starting the event loop.
+or negative, the timeout expires immediately upon starting the event loop.
 .Pp
 .Fn event_loopbreak
-has equivalent behavior to
-.Fn event_base_loopbreak
-but removes the
-.Va base
-argument and requires that the library must be initialized with
-.Xr event_init 3 .
-Likewise,
+and
 .Fn event_loopexit
-is equivalent to
-.Fn event_base_loopexit .
+have similar behavior to
+.Fn event_base_loopbreak
+and
+.Fn event_base_loopexit
+respectively, but require that the library be initialized with
+.Xr event_init 3 .
 .Sh RETURN VALUES
 These functions return 0 on success or \-1 on failure.
 .Sh SEE ALSO
-.Xr event_base_new 3 ,
 .Xr event_base_loop 3 ,
-.Xr event_base_priority_init 3 ,
-.Xr event_pending 3
+.Xr event_base_new 3 ,
+.Xr event_base_priority_init 3
 .Sh HISTORY
-.Pp
 .Fn event_loopexit
 first appeared in libevent-0.8 and has been available since
 .Ox 3.6 .
@@ -113,7 +112,6 @@ and
 .Fn event_base_loopbreak
 first appeared in libevent-1.4.1 and have been available since
 .Ox 4.8 .
-.El
 .Sh AUTHORS
 .Fn event_loopexit
 and
