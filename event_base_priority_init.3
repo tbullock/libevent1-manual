@@ -124,7 +124,9 @@ from the call to
 the default number of queues is one.
 .El
 .Pp
-The function will fail if the event has already been scheduled with
+The function will fail if the event has already been
+.Sy scheduled
+with
 .Xr event_add 3
 or the value of
 .Va pri
@@ -159,22 +161,12 @@ The program will terminate by calling
 .Xr event_set 3 ,
 .Xr event_set_log_callback 3
 .Sh HISTORY
-This manual is for libevent-1.4, with local changes for
-.Ox .
-.Pp
-.Fn event_base_priority_init ,
-.Fn event_priority_init ,
-and
-.Fn event_priority_set
-were introduced in libevent-1.0 and added to
+These functions first appeared in libevent-1.0 and have been available since
 .Ox 3.8 .
 .Sh AUTHORS
-The event library
-was written by
+The event library and these functions were written by
 .An -nosplit
-.An Niels Provos
-and
-.An Nick Mathewson .
+.An Niels Provos .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
