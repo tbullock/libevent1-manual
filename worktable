@@ -115,9 +115,9 @@ Ted: TTD; has internal list of things to adjust
 | event_loopbreak                | Yes | event_base_loopbreak.3     | No   |      |       |      | RDY |                                         |
 | event_loopexit                 | Yes | event_base_loopbreak.3     | No   |      |       |      | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_priority_init            | Yes | event_base_priority_init.3 | No   |      |       | OK   | TTD | Verify History secion                   |
-| event_priority_set             | Yes | event_base_priority_init.3 | No   |      |       | OK   | TTD |                                         |
-| event_base_priority_init       | Yes | event_base_priority_init.3 | No   |      |       | OK   | TTD |                                         |
+| event_priority_init            | Yes | event_base_priority_init.3 | No   |      |       | OK   | RDY |                                         |
+| event_priority_set             | Yes | event_base_priority_init.3 | No   |      |       | OK   | RDY |                                         |
+| event_base_priority_init       | Yes | event_base_priority_init.3 | No   |      |       | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | evsignal_add                   | Yes |                            | No   |      |       |      |     |                                         |
 | evsignal_dealloc               | Yes |                            | No   |      |       |      |     |                                         |
