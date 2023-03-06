@@ -32,11 +32,12 @@
 .Sh DESCRIPTION
 The
 .Fn event_base_get_method
-function returns the method that
-.Va base
-uses to dispatch events.
-This is the underlying mechanism used by the event loop to monitor file
-descriptors or other events.
+function returns the notification method registered to the
+.Vt event_base
+structure by
+.Xr event_base_new 3 .
+This is the underlying mechanism used by the event library to monitor file
+descriptor and signal events.
 On
 .Ox
 the default method is
@@ -73,27 +74,26 @@ returns an ASCII string containing the event library version in use.
 .Sh SEE ALSO
 .Xr event_base_new 3
 .Sh HISTORY
-This manual is for libevent-1.4, with local changes for
-.Ox .
-.Bl -bullet -width Ds
-.It
 .Fn event_base_get_method
-was first introduced in libevent-1.4.3, and added to
+first appeared in libevent-1.4.3 and has been available since
 .Ox 4.8 .
-.It
+.Pp
 .Fn event_get_version
 and
 .Fn event_get_method
-were added in libevent-1.0c, and appeared in
+first appeared in libevent-1.0c and have been available since
 .Ox 3.8 .
-.El
 .Sh AUTHORS
-The event library
-was written by
-.An -nosplit
-.An Niels Provos
+.An Nick Mathewson
+created
+.Fn event_get_version
 and
-.An Nick Mathewson .
+.Fn event_get_method .
+.Pp
+.An -nosplit
+.Fn event_base_get_method
+was written by
+.An Springande Ulv .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
