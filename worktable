@@ -44,9 +44,9 @@ Ted: TTD; has internal list of things to adjust
 | event_pending                  | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
 | event_initialized              | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| event_base_get_method          | Yes | event_base_get_method.3    | No   |      |       | OK   | TTD | Verify History section                  |
-| event_get_method               | Yes | event_base_get_method.3    | No   |      |       | OK   | TTD |                                         |
-| event_get_version              | Yes | event_base_get_method.3    | No   |      |       | OK   | TTD |                                         |
+| event_base_get_method          | Yes | event_base_get_method.3    | No   |      |       | OK   | RDY |                                         |
+| event_get_method               | Yes | event_base_get_method.3    | No   |      |       | OK   | RDY |                                         |
+| event_get_version              | Yes | event_base_get_method.3    | No   |      |       | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_err                      | No  |                            |      |      |       |      |     |                                         |
 | event_errx                     | No  |                            |      |      |       |      |     |                                         |
