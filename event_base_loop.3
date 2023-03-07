@@ -48,9 +48,7 @@ The
 .Fn event_base_loop
 family of functions start an event loop that replaces the main loop of a
 program.
-By default, they return when there are no more
-.Sy scheduled
-events.
+By default, they return when there are no more scheduled events.
 .Pp
 There are three types of events these functions monitor including signal,
 kernel and timer.
@@ -62,7 +60,7 @@ configured with
 Timer events are configured with
 .Xr evtimer_set 3 .
 .Pp
-The event library further categorizes events as:
+The event library further categorizes event states as:
 .Bl -tag -width "Initialized:"
 .It Sy Initialized :
 These have been configured with
@@ -110,9 +108,7 @@ the event loop.
 .It
 .Dv EVLOOP_NONBLOCK :
 Run the event loop in non-blocking mode.
-The loop returns after processing
-.Sy activated
-signal and kernel events but does
+The loop returns after processing activated signal and kernel events but does
 not wait for timer events to expire.
 .El
 .El
@@ -152,9 +148,7 @@ is set.
 .It 0
 on success, asked to terminate loop.
 .It 1
-on success, no remaining events left or
-.Sy scheduled
-in queue.
+on success, no remaining events left or scheduled in queue.
 .El
 .Sh ERRORS
 These functions have complex interactions with
