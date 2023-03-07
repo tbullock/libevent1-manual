@@ -92,7 +92,7 @@ is
 .Dv NULL .
 .It Va cb :
 A function pointer to a callback function.
-The behavior if
+The behavior, if
 .Va cb
 is
 .Dv NULL ,
@@ -107,10 +107,10 @@ A pointer to the
 .Vt evbuffer
 structure that triggered the callback.
 .It Va old :
-The original buffer size (bytes) before the change that triggered this
+The original buffer size in bytes before the change that triggered this
 callback.
 .It Va new :
-The new buffer size (bytes) after the change that triggered this callback.
+The new buffer size in bytes after the change that triggered this callback.
 .It Va arg :
 A void pointer to a user-defined data structure passed to the callback that
 corresponds to
