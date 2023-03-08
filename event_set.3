@@ -82,14 +82,10 @@ function prepares an
 structure to monitor a file descriptor or signal.
 Once prepared, the
 .Vt event
-can be
-.Sy scheduled
-using
+can be scheduled using
 .Fn event_add .
-The event becomes
-.Sy activated
-and the callback is triggered when the file descriptor state changes or
-timeout expires.
+The event becomes activated and the callback is triggered when the file
+descriptor state changes or timeout expires.
 Refer to
 .Xr event_base_loop 3
 for documentation on running an event loop.
@@ -201,9 +197,7 @@ structure, and the second argument is the
 to be reassigned.
 The behavior is undefined if either argument is
 .Dv NULL .
-Only events that have not been
-.Sy scheduled
-with
+Only events that have not been scheduled with
 .Fn event_add
 or corresponding helper macros or functions can be assigned to a new
 .Vt event_base
@@ -259,9 +253,7 @@ correspond to
 .Fn event_del .
 .Pp
 .Fn event_base_once
-is used to
-.Sy schedule
-a callback function to be executed exactly once without
+is used to schedule a callback function to be executed exactly once without
 requiring the caller to create and manage an
 .Vt event
 structure.
@@ -303,9 +295,7 @@ is similar to
 but requires that the library is initialized with
 .Xr event_init 3 .
 .Pp
-To check the status of a
-.Sy scheduled
-event, refer to the
+To check the status of a scheduled event, refer to the
 .Xr event_pending 3
 manual page.
 If a program needs to manually trigger an event, refer to
