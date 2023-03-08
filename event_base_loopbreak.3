@@ -34,9 +34,7 @@
 .Fn event_loopexit "const struct timeval *tv"
 .Sh DESCRIPTION
 These functions terminate an event loop early even if it would normally
-continue waiting for
-.Sy scheduled
-events.
+continue waiting for scheduled events.
 .Pp
 .Fn event_base_loopbreak
 is intended to be called from within a user-defined event callback where it
@@ -56,9 +54,8 @@ the function fails.
 .Fn event_base_loopexit
 schedules a timeout event that is triggered when
 .Fa tv
-time has passed and then exits the event loop after all
-.Sy activated
-events with the default queue number have been processed.
+time has passed and then exits the event loop after all activated events with
+the default queue number have been processed.
 For further information on queue numbers see
 .Xr event_base_priority_init 3 .
 The function fails if it is unable to configure the timeout event.

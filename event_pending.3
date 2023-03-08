@@ -40,9 +40,7 @@
 .Fd #define EV_WRITE	0x04
 .Fd #define EV_SIGNAL	0x08
 .Sh DESCRIPTION
-It is possible to query whether an event is
-.Sy scheduled
-with an event loop using
+It is possible to query whether an event is scheduled with an event loop using
 .Fn event_pending .
 .Pp
 An event is considered
@@ -60,6 +58,12 @@ An expiration timeout was configured.
 The event is
 .Sy activated
 and awaiting processing.
+Refer to
+.Xr event_base_loop 3
+for definitions of event states
+.Dq Sy activated
+and
+.Dq Sy initialized .
 .El
 .Pp
 This function checks whether an event was configured with
@@ -136,9 +140,7 @@ The macros
 .Fn evtimer_initialized
 and
 .Fn signal_initialized
-evaluate to a non-zero value indicating whether the event was
-.Sy initialized
-with
+evaluate to a non-zero value indicating whether the event was initialized with
 .Xr event_set 3
 or not.
 The behavior is undefined if
@@ -147,17 +149,15 @@ is
 .Dv NULL .
 .Sh RETURN VALUES
 .Fn event_pending
-returns 0 if the event is not
-.Sy scheduled
-or a non-zero bitmap comprised of the queried event flags
+returns 0 if the event is not scheduled or a non-zero bitmap comprised of the
+queried event flags
 .Pq Dv EV_READ , Dv EV_WRITE , Dv EV_SIGNAL or Dv EV_TIMEOUT
 if it is.
 .Pp
 The
 .Fn event_initialized
-and related macros evaluate to 0 if the event is not
-.Sy initialized
-and evaluate to a non-zero value if it is.
+and related macros evaluate to 0 if the event is not initialized and evaluate
+to a non-zero value if it is.
 .Sh SEE ALSO
 .Xr event_set 3
 .Sh HISTORY

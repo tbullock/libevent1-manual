@@ -124,12 +124,10 @@ from the call to
 the default number of queues is one.
 .El
 .Pp
-The function will fail if the event has already been
-.Sy scheduled
-with
+The function will fail if the event has already been scheduled with
 .Xr event_add 3
 or the value of
-.Va pri
+.Fa pri
 is invalid.
 .Sh RETURN VALUES
 .Fn event_base_priority_init ,
