@@ -1,0 +1,108 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVBUFFER_EXPAND 3
+.Os
+.Sh NAME
+.Nm evbuffer_expand
+.Nd grow allocated buffer size
+.Sh SYNOPSIS
+.In event.h
+.Ft int
+.Fn evbuffer_expand "struct evbuffer *buf" "size_t datlen"
+.Sh DESCRIPTION
+Although the
+.Sy evbuffer
+API automatically grows allocated memory throughout normal operation, programs
+may manually expand the amount of memory allocated to an
+.Va evbuffer
+to accommodate new data.
+The purpose of
+.Fn evbuffer_expand
+is to ensure that there are at least
+.Fa datlen
+bytes of memory allocated to the
+.Va evbuffer
+structure
+.Fa buf .
+The function will cause undefined behavior if
+.Fa buf
+is
+.Dv NULL .
+.Pp
+The amount of memory assigned to an
+.Va evbuffer
+is always at least as large as the amount of data stored.
+.Fn evbuffer_expand
+will ensure that a minimum of 256 bytes of memory is allocated when invoked on
+an empty structure or for values of
+.Fa datlen
+less than 256.
+For values of
+.Fa datlen
+256 and above the function will allocate new memory in increments of powers of
+two up to
+.Dv SIZE_MAX
+divided by 2, after which it will allocate the sum of the current data length
+and
+.Fa datlen .
+This function will explicitly discard old memory pages with
+.Xr recallocarray 3
+if it increases allocated memory to the
+.Va evbuffer .
+.Pp
+An internal concept called misalignment occurs to
+.Sy evbuffers
+when the beginning of the data stored in a buffer does not correspond to the
+first byte of allocated memory.
+This happens normally as data is drained and added throughout the execution of
+a program.
+.Fn evbuffer_expand
+ensures that the buffered data will be aligned to the beginning of allocated
+memory unless
+.Fa datlen
+is small enough not to require altering the buffer.
+.Sh RETURN VALUES
+This function returns 0 when
+.Fa buf
+has sufficient allocated memory to accommodate
+.Fa datlen
+bytes and \-1 if there is an error allocating memory or if resizing to
+.Fa datlen
+bytes would overflow past
+.Dv SIZE_MAX .
+.\" .Sh EXAMPLES
+.Sh ERRORS
+This function does not set
+.Va errno
+on all error conditions although if the internal call to
+.Xr recallocarray 3
+fails,
+.Va errno
+will be preserved.
+.Sh SEE ALSO
+.Xr evbuffer_new 3
+.Sh HISTORY
+.Fn evbuffer_expand
+first appeared in libevent-0.9 and have been available since
+.Ox 3.8 .
+.Sh AUTHORS
+The event library and this function was written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
