@@ -96,7 +96,7 @@ Ted: TTD; has internal list of things to adjust
 | evbuffer_add_printf            | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_add_vprintf           | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_drain                 | Yes |                            | No   |      |       |      |     |                                         |
-| evbuffer_expand                | Yes |                            | No   |      |       |      |     |                                         |
+| evbuffer_expand                | Yes | evbuffer_expand.3          | No   |      |       |      |     |                                         |
 | evbuffer_find                  | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_free                  | Yes | evbuffer_new.3             | No   |      |       |      | RDY |                                         |
 | evbuffer_new                   | Yes | evbuffer_new.3             | No   |      |       |      | RDY | Verify History section                  |
