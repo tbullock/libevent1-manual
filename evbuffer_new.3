@@ -50,7 +50,7 @@ The
 data structure is used throughout the
 .Sy evbuffer
 API for buffering and manipulating sequences of bytes.
-It is a dynamic buffer that can grow as data is added to it and can be used
+It is a dynamic buffer that can grow as data is added to it and is used
 for a variety of purposes, including network and file I/O as well as
 intra-process communication.
 An optional user-defined callback can be assigned to an
@@ -60,7 +60,7 @@ to notify programs of changes to the data structure.
 .Fn evbuffer_new
 allocates memory for a new, empty
 .Va evbuffer
-structure that can be used to store data and can be passed to other functions
+structure that is used to store data and is passed to other functions
 in the library to append, remove, or modify data in the buffer.
 .Pp
 .Fn evbuffer_free
