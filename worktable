@@ -91,10 +91,10 @@ Ted: TTD; has internal list of things to adjust
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | encode_int                     | Yes |                            |      |      |       |      |     |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| evbuffer_add                   | Yes |                            | No   |      |       |      |     |                                         |
-| evbuffer_add_buffer            | Yes |                            | No   |      |       |      |     |                                         |
-| evbuffer_add_printf            | Yes |                            | No   |      |       |      |     |                                         |
-| evbuffer_add_vprintf           | Yes |                            | No   |      |       |      |     |                                         |
+| evbuffer_add                   | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
+| evbuffer_add_buffer            | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
+| evbuffer_add_printf            | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
+| evbuffer_add_vprintf           | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
 | evbuffer_drain                 | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_expand                | Yes | evbuffer_expand.3          | No   |      |       |      |     |                                         |
 | evbuffer_find                  | Yes |                            | No   |      |       |      |     |                                         |
