@@ -1,0 +1,186 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVBUFFER_ADD 3
+.Os
+.Sh NAME
+.Nm evbuffer_add ,
+.Nm evbuffer_add_buffer ,
+.Nm evbuffer_add_printf ,
+.Nm evbuffer_add_vprintf
+.Nd add data to an evbuffer
+.Sh SYNOPSIS
+.In event.h
+.Ft int
+.Fn evbuffer_add "struct evbuffer *buf" "const void *data" "size_t datlen"
+.Ft int
+.Fn evbuffer_add_buffer "struct evbuffer *outbuf" "struct evbuffer *inbuf"
+.Ft int
+.Fn evbuffer_add_printf "struct evbuffer *buf" "const char *fmt" ...
+.In stdarg.h
+.Ft int
+.Fn evbuffer_add_vprintf "struct evbuffer *buf" "const char *fmt" "va_list ap"
+.Sh DESCRIPTION
+These functions all interact with
+.Sy evbuffers
+by appending data to them.
+The normal workflow is to add data to a buffer, and later remove that data
+either by reading it back in bytes or lines, or possibly writing it out to a
+file descriptor.
+Adding data is accomplished by either a structured or unstructured
+mechanism.
+.Fn evbuffer_add
+and
+.Fn evbuffer_add_buffer
+add data by moving raw bytes into a buffer.
+Alternatively, formatted data is added using
+.Fn evbuffer_add_printf
+or
+.Fn evbuffer_add_vprintf .
+.Pp
+All of these functions dynamically allocate new memory to an
+.Va evbuffer
+using
+.Xr evbuffer_expand 3
+if there is insufficient space.
+An optional callback function configured with
+.Xr evbuffer_setcb 3
+is invoked at the successful end of the functions to inform programs about how
+the size of the buffer has changed.
+These functions must also be invoked with an
+.Va evbuffer
+structure initialized by
+.Xr evbuffer_new 3
+otherwise they cause undefined behavior.
+.Pp
+.Fn evbuffer_add
+appends raw bytes from the user-specified pointer
+.Fa data
+to the
+.Va evbuffer
+structure
+.Fa buf .
+The number of bytes to append is denoted by the argument
+.Fa datlen .
+If
+.Fa buf
+or
+.Fa data
+is
+.Dv NULL
+the function causes undefined behavior, if
+.Fa datlen
+is zero the function makes no changes to
+.Fa buf .
+.Pp
+.Fn evbuffer_add_buffer
+appends all buffered data from the
+.Va evbuffer
+structure
+.Fa inbuf
+to the target
+.Va evbuffer
+structure
+.Fa outbuf .
+The
+.Fa inbuff
+buffer is drained in the process leaving it empty.
+The callback notification function is invoked for both
+.Va evbuffer
+structures.
+If either argument is
+.Dv NULL
+the function causes undefined behavior.
+.Pp
+.Fn evbuffer_add_printf
+appends a formatted string
+.Fa fmt
+to an
+.Va evbuffer
+structure
+.Fa buf .
+The semantics of the format string and any subsequent arguments are equivalent
+to
+.Xr printf 3 .
+The function causes undefined behavior if
+.Fa buf
+is
+.Dv NULL .
+.Pp
+.Fn evbuffer_add_vprintf
+also appends a formatted string
+.Fa fmt
+to an
+.Va evbuffer
+structure
+.Fa buf
+but is similar to
+.Xr vprintf 3
+with argument
+.Fa ap
+accessed via the variable-length argument facilities of
+.Xr va_start 3 .
+The function causes undefined behavior if
+.Fa buf
+is
+.Dv NULL .
+.Sh RETURN VALUES
+These functions return 0 on success or \-1 on failure.
+.\" .Sh EXAMPLES
+.Sh ERRORS
+These functions fail if they attempt to grow the
+.Va evbuffer ,
+and
+.Xr evbuffer_expand 3
+is unable to allocate new memory.
+Any
+.Va errno
+value set by the internal call to
+.Xr evbuffer_expand 3
+is preserved.
+.Pp
+.Fn evbuffer_add_printf
+and
+.Fn evbuffer_add_vprintf
+use the c library function
+.Xr vsnprintf 3
+to implement their functionality,
+.Va errno
+values are preserved if it encounters a problem.
+.Sh SEE ALSO
+.Xr evbuffer_expand 3 ,
+.Xr evbuffer_new 3 ,
+.Xr evbuffer_setcb 3 ,
+.Xr vsnprintf 3
+.Sh HISTORY
+.Fn evbuffer_add_vprintf
+first appeared in libevent-1.2 and has been available since
+.Ox 3.9 .
+.Pp
+The remaining functions first appeared in libevent-0.8 and have been
+available since
+.Ox 3.6 .
+.Sh AUTHORS
+.Fn evbuffer_add_vprintf
+was written by
+.An -nosplit
+.An Artur Grabowski .
+.Pp
+The remaining functions were written by
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
