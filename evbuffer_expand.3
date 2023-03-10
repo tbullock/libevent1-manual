@@ -38,7 +38,7 @@ bytes of memory allocated to the
 .Va evbuffer
 structure
 .Fa buf .
-The function will cause undefined behavior if
+The function causes undefined behavior if
 .Fa buf
 is
 .Dv NULL .
@@ -47,19 +47,19 @@ The amount of memory assigned to an
 .Va evbuffer
 is always at least as large as the amount of data stored.
 .Fn evbuffer_expand
-will ensure that a minimum of 256 bytes of memory is allocated when invoked on
+ensures that a minimum of 256 bytes of memory is allocated when invoked on
 an empty structure or for values of
 .Fa datlen
 less than 256.
 For values of
 .Fa datlen
-256 and above the function will allocate new memory in increments of powers of
+256 and above the function allocates new memory in increments of powers of
 two up to
 .Dv SIZE_MAX
-divided by 2, after which it will allocate the sum of the current data length
+divided by 2, after which it allocates the sum of the current data length
 and
 .Fa datlen .
-This function will explicitly discard old memory pages with
+This function explicitly discards old memory pages with
 .Xr recallocarray 3
 if it increases allocated memory to the
 .Va evbuffer .
@@ -71,7 +71,7 @@ first byte of allocated memory.
 This happens normally as data is drained and added throughout the execution of
 a program.
 .Fn evbuffer_expand
-ensures that the buffered data will be aligned to the beginning of allocated
+ensures that the buffered data is aligned to the beginning of allocated
 memory unless
 .Fa datlen
 is small enough not to require altering the buffer.
@@ -92,7 +92,7 @@ on all error conditions although if the internal call to
 .Xr recallocarray 3
 fails,
 .Va errno
-will be preserved.
+is preserved.
 .Sh SEE ALSO
 .Xr evbuffer_new 3
 .Sh HISTORY
