@@ -71,10 +71,10 @@ first byte of allocated memory.
 This happens normally as data is drained and added throughout the execution of
 a program.
 .Fn evbuffer_expand
-ensures that the buffered data is aligned to the beginning of allocated
-memory unless
+guarantees that buffered data will be aligned with the beginning of
+allocated memory unless
 .Fa datlen
-is small enough not to require altering the buffer.
+is small enough to avoid modifying the buffer.
 .Sh RETURN VALUES
 This function returns 0 when
 .Fa buf
