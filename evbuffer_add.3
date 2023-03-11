@@ -42,9 +42,10 @@ either by reading it back in bytes or lines, or possibly writing it out to a
 file descriptor.
 Adding data is accomplished by either a structured or unstructured
 mechanism.
-.Fn evbuffer_add
-and
+.Fn evbuffer_add ,
 .Fn evbuffer_add_buffer
+or
+.Xr evbuffer_read 3
 add data by moving raw bytes into a buffer.
 Alternatively, formatted data is added using
 .Fn evbuffer_add_printf
@@ -97,12 +98,12 @@ structure
 .Fa outbuf .
 The
 .Fa inbuff
-buffer is drained in the process leaving it empty.
+buffer is drained in the process, leaving it empty.
 The callback notification function is invoked for both
 .Va evbuffer
 structures.
 If either argument is
-.Dv NULL
+.Dv NULL ,
 the function causes undefined behavior.
 .Pp
 .Fn evbuffer_add_printf
@@ -155,9 +156,9 @@ is preserved.
 .Fn evbuffer_add_printf
 and
 .Fn evbuffer_add_vprintf
-use the c library function
+use the C library function
 .Xr vsnprintf 3
-to implement their functionality,
+to implement their functionality;
 .Va errno
 values are preserved if it encounters a problem.
 .Sh SEE ALSO
