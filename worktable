@@ -100,12 +100,12 @@ Ted: TTD; has internal list of things to adjust
 | evbuffer_find                  | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_free                  | Yes | evbuffer_new.3             | No   |      |       |      | RDY |                                         |
 | evbuffer_new                   | Yes | evbuffer_new.3             | No   |      |       |      | RDY | Verify History section                  |
-| evbuffer_read                  | Yes |                            | No   |      |       |      |     |                                         |
+| evbuffer_read                  | Yes | evbuffer_read.3            | No   |      |       |      |     |                                         |
 | evbuffer_readline              | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_readln                | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_remove                | Yes |                            | No   |      |       |      |     |                                         |
 | evbuffer_setcb                 | Yes | evbuffer_new.3             | No   |      |       |      | RDY |                                         |
-| evbuffer_write                 | Yes |                            | No   |      |       |      |     |                                         |
+| evbuffer_write                 | Yes | evbuffer_read.3            | No   |      |       |      |     |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_asr_abort                | Yes |                            | No   |      |       |      |     |                                         |
 | event_asr_run                  | Yes |                            | No   |      |       |      |     |                                         |
