@@ -1,0 +1,177 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVBUFFER_READ 3
+.Os
+.Sh NAME
+.Nm evbuffer_read ,
+.Nm evbuffer_write
+.Nd evbuffer support for file I/O
+.Sh SYNOPSIS
+.In event.h
+.Fd #define EVBUFFER_MAX_READ	4096
+.Ft int
+.Fn evbuffer_read "struct evbuffer *buf" "int fd" "int howmuch"
+.Ft int
+.Fn evbuffer_write "struct evbuffer *buf" "int fd"
+.Sh DESCRIPTION
+The
+.Sy evbuffer
+API provides functions to provide file I/O to and from
+.Va evbuffer
+structures.
+These functions append to or drain from an
+.Va evbuffer
+while providing read and write file descriptor operations.
+An optional callback function configured with
+.Xr evbuffer_setcb 3
+is invoked at the successful end of the functions to inform programs about how
+the size of the buffer has changed.
+.Pp
+.Fn evbuffer_read
+appends
+.Fa howmuch
+bytes from the open file descriptor
+.Fa fd
+to the
+.Va evbuffer
+structure
+.Fa buf .
+The function causes undefined behavior if
+.Fa buf
+is
+.Dv NULL .
+.Pp
+The
+.Fa howmuch
+argument does not necessarily specify the exact number of bytes to read from
+the file descriptor.
+It is a
+.Em suggested
+amount that the function may adjust depending on the number of bytes available
+to read and the read limit set by
+.Dv EVBUFFER_MAX_READ .
+The function behavior for different ranges of
+.Fa howmuch
+are as follows:
+.Bl -tag -width 12n
+.It Sy howmuch < 0
+The function reads the minimum of the bytes available to read or
+.Dv EVBUFFER_MAX_READ .
+If the bytes available cannot be determined, it attempts to read
+.Dv EVBUFFER_MAX_READ
+bytes.
+.It Sy howmuch = 0
+The function effectively does nothing, reading 0 bytes from the file
+descriptor and appending 0 bytes to the buffer.
+.It Sy howmuch > 0 && howmuch <= EVBUFFER_MAX_READ
+The function reads the minimum of
+.Fa howmuch
+or the number of bytes available to read.
+.It Sy howmuch > EVBUFFER_MAX_READ
+The function reads the minimum of the bytes available to read or
+.Dv EVBUFFER_MAX_READ .
+If the bytes available cannot be determined, it attempts to read
+.Dv EVBUFFER_MAX_READ
+bytes.
+.El
+.Pp
+If necessary the function grows the buffer with
+.Xr evbuffer_expand 3
+to store the calculated number of bytes.
+.Pp
+.Fn evbuffer_write
+attempts to write the entire contents of the
+.Vt evbuffer
+structure
+.Fa buf
+to the open file descriptor
+.Fa fd .
+The buffer is drained in the process, leaving it empty.
+The function causes undefined behavior if
+.Fa buf
+is
+.Dv NULL .
+.Sh RETURN VALUES
+If successful,
+.Fn evbuffer_read
+returns the number of bytes appended to
+.Fa buf .
+Upon reading end-of-file, zero is returned.
+Upon failure \-1 is returned and
+.Va errno
+is set to indicate the error.
+.Pp
+If successful,
+.Fn evbuffer_write
+returns the number of bytes drained from
+.Fa buf
+to
+.Fa fd .
+Upon failure \-1 is returned and
+.Va errno
+is set to indicate the error.
+.\" .Sh EXAMPLES
+.Sh ERRORS
+.Fn evbuffer_read
+fails if
+.Xr evbuffer_expand 3
+is unable to allocate new memory or the system call
+.Xr read 2
+reports a problem;
+.Va errno
+values are preserved.
+.Pp
+.Fn evbuffer_write
+fails if the system call
+.Xr write 2
+reports a problem;
+.Va errno
+values are preserved.
+.Sh SEE ALSO
+.Xr read 2 ,
+.Xr write 2 ,
+.Xr evbuffer_add 3 ,
+.Xr evbuffer_expand 3 ,
+.Xr evbuffer_new 3
+.Sh HISTORY
+These functions first appeared in libevent-0.8 and have been available since
+.Ox 3.6 .
+.Sh AUTHORS
+The event library and these functions were written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh BUGS
+.Fn evbuffer_read
+and
+.Fn evbuffer_write
+return an
+.Vt int
+which can truncate the
+.Vt ssize_t
+return value of
+.Xr read 2
+and
+.Xr write 2
+for very large I/O operations.
+.Fn evbuffer_read
+cannot directly trigger this truncation because it enforces a maximum read
+length of
+.Dv EVBUFFER_MAX_READ
+which is hard coded as 4096 bytes.
