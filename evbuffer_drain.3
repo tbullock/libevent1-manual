@@ -62,6 +62,9 @@ If
 .Fa len
 is greater than or equal to the length of stored data, the function resets
 internal buffer offsets to zero leaving it effectively empty.
+An optional callback function configured with
+.Xr evbuffer_setcb 3
+is invoked at the end of the function.
 .Pp
 Refer to
 .Xr evbuffer_expand 3
