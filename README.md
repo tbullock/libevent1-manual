@@ -22,3 +22,5 @@ Internally OpenBSD bundled programs rely on libevent including:
 | dvmrpd        | rad           |               |
 
 Refer to the file worktable for a breakdown of project status.
+
+The current task is documenting the evbuffer API.
