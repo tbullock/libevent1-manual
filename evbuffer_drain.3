@@ -31,7 +31,7 @@
 .Sh DESCRIPTION
 These functions provide a mechanism to remove data from the beginning of an
 .Vt evbuffer .
-An optional callback function can be set using
+An optional callback function is set using
 .Xr evbuffer_setcb 3
 to inform programs about changes in buffer size.
 .Pp
@@ -149,7 +149,7 @@ which can truncate the
 number of bytes removed for large buffers.
 .Pp
 The following test checks for overflow before invoking the function so the
-return value can be trusted:
+return value is trusted:
 .Bd -literal -offset indent
 #include <stdint.h>
 /* ... */
