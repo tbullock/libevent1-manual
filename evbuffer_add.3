@@ -34,33 +34,28 @@
 .Ft int
 .Fn evbuffer_add_vprintf "struct evbuffer *buf" "const char *fmt" "va_list ap"
 .Sh DESCRIPTION
-These functions all interact with
-.Sy evbuffers
-by appending data to them.
-The normal workflow is to add data to a buffer, and later remove that data
-either by reading it back in bytes or lines, or possibly writing it out to a
-file descriptor.
-Adding data is accomplished by either a structured or unstructured
-mechanism.
+These functions all append data to an
+.Vt evbuffer .
+The standard workflow involves adding data to a buffer and later retrieving it
+by reading it back in bytes or lines, or by writing it out to a file
+descriptor.
+Raw bytes are appended to a buffer using the functions
 .Fn evbuffer_add ,
 .Fn evbuffer_add_buffer
 or
-.Xr evbuffer_read 3
-add data by moving raw bytes into a buffer.
-Alternatively, formatted data is added using
+.Xr evbuffer_read 3 .
+Formatted data is added using the functions
 .Fn evbuffer_add_printf
 or
 .Fn evbuffer_add_vprintf .
 .Pp
-All of these functions dynamically allocate new memory to an
-.Va evbuffer
-using
-.Xr evbuffer_expand 3
-if there is insufficient space.
-An optional callback function configured with
+If an
+.Vt evbuffer
+has insufficient space, these functions allocate new memory dynamically using
+.Xr evbuffer_expand 3 .
+An optional callback function is set using
 .Xr evbuffer_setcb 3
-is invoked at the successful end of the functions to inform programs about how
-the size of the buffer has changed.
+to inform programs about changes in buffer size.
 These functions must also be invoked with an
 .Va evbuffer
 structure initialized by
@@ -97,7 +92,7 @@ to the target
 structure
 .Fa outbuf .
 The
-.Fa inbuff
+.Fa inbuf
 buffer is drained in the process, leaving it empty.
 The callback notification function is invoked for both
 .Va evbuffer
