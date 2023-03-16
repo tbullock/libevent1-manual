@@ -14,106 +14,153 @@
 .\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 .\"
 .Dd $Mdocdate$
-.Dt EVBUFFER_DRAIN 3
+.Dt EVBUFFER_REMOVE 3
 .Os
 .Sh NAME
+.Nm evbuffer_remove ,
 .Nm evbuffer_drain
 .Nd clear bytes from the beginning of an evbuffer
 .Sh SYNOPSIS
 .In event.h
+.Ft int
+.Fn evbuffer_remove "struct evbuffer *buf" "void *data" "size_t datlen"
 .Ft void
 .Fn evbuffer_drain "struct evbuffer *buf" "size_t len"
 .Fd #define EVBUFFER_LENGTH(x) 	(x)->off
 .Fd #define EVBUFFER_DATA(x)  	(x)->buffer
 .Sh DESCRIPTION
-Although the
-.Sy evbuffer
-API automatically empties buffers throughout normal operation, programs may
-manually drain data from the buffer using
-.Fn evbuffer_drain .
-This function adjusts the internal offsets used to keep track of the beginning
-of stored data and does not provide access to data being drained.
-Typically this function is called internally from other
-.Sy evbuffer
-API functions as part of bookkeeping.
+These functions provide a mechanism to remove data from the beginning of an
+.Vt evbuffer .
+An optional callback function can be set using
+.Xr evbuffer_setcb 3
+to inform programs about changes in buffer size.
+.Pp
+.Fn evbuffer_remove
+copies
+.Fa datlen
+bytes from the
+.Vt evbuffer
+structure
+.Fa buf
+to a user-specified pointer
+.Fa data
+and drains those bytes from the buffer accordingly.
+.Pp
+If
+.Fa datlen
+is zero, the function makes no changes to
+.Fa buf .
+If
+.Fa datlen
+exceeds the buffer length of
+.Fa buf ,
+the function copies the available bytes to
+.Fa data
+but leaves the remaining space uninitialized.
+If
+.Fa buf
+or
+.Fa data
+is
+.Dv NULL ,
+or
+.Fa data
+is not a valid pointer to at least
+.Fa datlen
+bytes, the function causes undefined behavior.
 .Pp
 .Fn evbuffer_drain
-empties the first
+attempts to remove up to the first
 .Fa len
-bytes of data from the
-.Va evbuffer
+bytes from the
+.Vt evbuffer
 structure
-.Fa buf .
-The function causes undefined behavior if
+.Fa buf
+by adjusting internal offsets.
+If the buffer is shorter than
+.Fa len ,
+it empties the buffer entirely.
+If
 .Fa buf
 is
-.Dv NULL .
-If
-.Fa len
-is less than the length of stored data, the function adjusts internal
-misalignment offsets by
-.Fa len
-bytes.
-This leaves the buffer effectively shorter, with the beginning of stored data
-moved
-.Fa len
-bytes further into the buffer.
-If
-.Fa len
-is greater than or equal to the length of stored data, the function resets
-internal buffer offsets to zero leaving it effectively empty.
-An optional callback function configured with
-.Xr evbuffer_setcb 3
-is invoked at the end of the function.
-.Pp
-Refer to
-.Xr evbuffer_expand 3
-for an explanation of misalignment in the
-.Sy evbuffer
-API.
-.Pp
+.Dv NULL ,
+the behavior is undefined.
 .Fn evbuffer_drain
-does not explicitly clear memory.
-It removes data from the front of the buffer by adjusting internal offset
-values, but it does not modify or clear the memory used to store the removed
-data.
+does not provide access to removed data nor does it clear removed memory.
 .Pp
 .Fn EVBUFFER_LENGTH x
-evaluates to the variable representing the length of data stored in the
+expands to the number of bytes stored in
 .Vt evbuffer
-.Fa x
-using internal structure fields.
-This macro will cause a segmentation fault if
-.Fa x
-is
-.Dv NULL
-or not an
-.Vt evbuffer .
-Use of this macro is not advised.
+.Fa x .
 .Pp
 .Fn EVBUFFER_DATA x
-evaluates to the pointer representing the dynamic data buffer of the
+expands to a pointer to the beginning of buffered data in
 .Vt evbuffer
-.Fa x
-using internal structure fields.
-This macro will cause a segmentation fault if
+.Fa x .
+.Pp
+These macros cause a segmentation fault if
 .Fa x
 is
-.Dv NULL
-or not an
-.Vt evbuffer .
-Use of this macro is not advised.
+.Dv NULL .
+Modifying a buffers length invalidates these expansion results.
+.Sh RETURN VALUES
+.Fn evbuffer_remove
+returns the number of bytes copied to
+.Fa data .
 .Sh SEE ALSO
 .Xr evbuffer_expand 3 ,
 .Xr evbuffer_new 3
 .Sh HISTORY
-These macros and function first appeared in libevent-0.8 and have been
+.Fn evbuffer_remove
+first appeared in libevent-0.9 and has been available since
+.Ox 3.8 .
+.Pp
+.Fn evbuffer_drain ,
+.Fn EVBUFFER_LENGTH
+and
+.Fn EVBUFFER_DATA
+first appeared in libevent-0.8 and have been
 available since
 .Ox 3.6 .
 .Sh AUTHORS
-These macros and function were written by
+These macros and functions were written by
 .An -nosplit
 .An Niels Provos .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh CAVEATS
+While the
+.Fn EVBUFFER_LENGTH
+and
+.Fn EVBUFFER_DATA
+macros expose the fields of the
+.Vt struct evbuffer
+data structure, this behavior cannot be relied upon in other versions of the
+library as it is subject to change and is not a promise of the
+.Sy evbuffer
+API.
+.Sh BUGS
+.Fn evbuffer_remove
+returns an
+.Vt int
+which can truncate the
+.Fa size_t datlen
+number of bytes removed for large buffers.
+.Pp
+The following test checks for overflow before invoking the function so the
+return value can be trusted:
+.Bd -literal -offset indent
+#include <stdint.h>
+/* ... */
+
+size_t datlen;
+int bytes_removed;
+/* ... */
+
+if (datlen > INT_MAX) {
+    /* handle the overflow error appropriately */
+}
+/* advise casting to 'int' to explicitly mark overflow tested */
+bytes_removed = (int)evbuffer_remove(buf, (int)datlen)
+.Ed
