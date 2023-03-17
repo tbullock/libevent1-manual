@@ -148,19 +148,20 @@ which can truncate the
 .Fa size_t datlen
 number of bytes removed for large buffers.
 .Pp
-The following test checks for overflow before invoking the function so the
+The following test checks for truncation before invoking the function so the
 return value is trusted:
 .Bd -literal -offset indent
 #include <stdint.h>
 /* ... */
 
 size_t datlen;
+uint8_t *data;
 int bytes_removed;
 /* ... */
 
 if (datlen > INT_MAX) {
-    /* handle the overflow error appropriately */
+    /* handle the truncation error appropriately */
 }
-/* advise casting to 'int' to explicitly mark overflow tested */
-bytes_removed = (int)evbuffer_remove(buf, (int)datlen)
+/* advise casting to 'int' to explicitly mark truncation tested */
+bytes_removed = (int)evbuffer_remove(buf, data, (int)datlen)
 .Ed
