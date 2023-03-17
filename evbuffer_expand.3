@@ -24,66 +24,35 @@
 .Ft int
 .Fn evbuffer_expand "struct evbuffer *buf" "size_t datlen"
 .Sh DESCRIPTION
-Although the
-.Sy evbuffer
-API automatically grows allocated memory throughout normal operation, programs
-may manually expand the amount of memory allocated to an
-.Va evbuffer
-to accommodate new data.
-The purpose of
 .Fn evbuffer_expand
-is to ensure that there are at least
-.Fa datlen
-bytes of memory allocated to the
-.Va evbuffer
+is used to grow the memory buffer of an
+.Vt evbuffer
 structure
-.Fa buf .
-The function causes undefined behavior if
+.Fa buf
+by at least
+.Fa datlen
+bytes of data.
+.Pp
+If the buffer already has enough space, the function makes no changes.
+.Pp
+If the buffer does not have enough space, the function resizes it by
+allocating a larger block of memory.
+The new size of the buffer is calculated to be large enough to hold at least
+the sum of the current buffer length and
+.Fa datlen .
+.Pp
+If
 .Fa buf
 is
-.Dv NULL .
-.Pp
-The amount of memory assigned to an
-.Va evbuffer
-is always at least as large as the amount of data stored.
-.Fn evbuffer_expand
-ensures that a minimum of 256 bytes of memory is allocated when invoked on
-an empty structure or for values of
-.Fa datlen
-less than 256.
-For values of
-.Fa datlen
-256 and above the function allocates new memory in increments of powers of
-two up to
-.Dv SIZE_MAX
-divided by 2, after which it allocates the sum of the current data length
-and
-.Fa datlen .
-This function explicitly discards old memory pages with
-.Xr recallocarray 3
-if it increases allocated memory to the
-.Va evbuffer .
-.Pp
-An internal concept called misalignment occurs to
-.Sy evbuffers
-when the beginning of the data stored in a buffer does not correspond to the
-first byte of allocated memory.
-This happens normally as data is drained and added throughout the execution of
-a program.
-.Fn evbuffer_expand
-guarantees that buffered data will be aligned with the beginning of
-allocated memory unless
-.Fa datlen
-is small enough to avoid modifying the buffer.
+.Dv NULL ,
+the function causes undefined behavior.
 .Sh RETURN VALUES
 This function returns 0 when
 .Fa buf
-has sufficient allocated memory to accommodate
-.Fa datlen
-bytes and \-1 if there is an error allocating memory or if resizing to
-.Fa datlen
-bytes would overflow past
-.Dv SIZE_MAX .
+has sufficient allocated memory and \-1 if there is an error allocating memory
+or if resizing would overflow past
+.Dv SIZE_MAX
+bytes.
 .\" .Sh EXAMPLES
 .Sh ERRORS
 This function does not set
@@ -97,12 +66,22 @@ is preserved.
 .Xr evbuffer_new 3
 .Sh HISTORY
 .Fn evbuffer_expand
-first appeared in libevent-0.9 and have been available since
+first appeared in libevent-0.9 and has been available since
 .Ox 3.8 .
 .Sh AUTHORS
-The event library and this function was written by
+This function was written by
 .An -nosplit
 .An Niels Provos .
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh CAVEATS
+The
+.Ox
+event library version of
+.Fn evbuffer_expand
+uses
+.Xr recallocarray 3
+to allocate new memory blocks and guarantee that memory becoming unallocated
+is explicitly discarded.
+This behavior cannot be relied upon in other versions of the library.
