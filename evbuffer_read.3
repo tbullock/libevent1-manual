@@ -22,7 +22,6 @@
 .Nd evbuffer support for file I/O
 .Sh SYNOPSIS
 .In event.h
-.Fd #define EVBUFFER_MAX_READ	4096
 .Ft int
 .Fn evbuffer_read "struct evbuffer *buf" "int fd" "int howmuch"
 .Ft int
@@ -61,33 +60,8 @@ argument does not necessarily specify the exact number of bytes to read from
 the file descriptor.
 It is a
 .Em suggested
-amount that the function may adjust depending on the number of bytes available
-to read and the read limit set by
-.Dv EVBUFFER_MAX_READ .
-The function behavior for different ranges of
-.Fa howmuch
-are as follows:
-.Bl -tag -width 12n
-.It Sy howmuch < 0
-The function reads the minimum of the bytes available to read or
-.Dv EVBUFFER_MAX_READ .
-If the bytes available cannot be determined, it attempts to read
-.Dv EVBUFFER_MAX_READ
-bytes.
-.It Sy howmuch = 0
-The function effectively does nothing, reading 0 bytes from the file
-descriptor and appending 0 bytes to the buffer.
-.It Sy howmuch > 0 && howmuch <= EVBUFFER_MAX_READ
-The function reads the minimum of
-.Fa howmuch
-or the number of bytes available to read.
-.It Sy howmuch > EVBUFFER_MAX_READ
-The function reads the minimum of the bytes available to read or
-.Dv EVBUFFER_MAX_READ .
-If the bytes available cannot be determined, it attempts to read
-.Dv EVBUFFER_MAX_READ
-bytes.
-.El
+amount that the function may adjust and is not a guarantee of either a minimum
+or maximum.
 .Pp
 If necessary the function grows the buffer with
 .Xr evbuffer_expand 3
@@ -170,8 +144,3 @@ return value of
 and
 .Xr write 2
 for very large I/O operations.
-.Fn evbuffer_read
-cannot directly trigger this truncation because it enforces a maximum read
-length of
-.Dv EVBUFFER_MAX_READ
-which is hard coded as 4096 bytes.
