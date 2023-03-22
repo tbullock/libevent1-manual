@@ -1,0 +1,216 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVBUFFER_READLN 3
+.Os
+.Sh NAME
+.Nm evbuffer_readln ,
+.Nm evbuffer_readline
+.Nd read lines of buffered data
+.Sh SYNOPSIS
+.In event.h
+.Ft "char *"
+.Fo evbuffer_readln
+.Fa "struct evbuffer *buf"
+.Fa "size_t *read_out"
+.Fa "enum evbuffer_eol_style eol_style"
+.Fc
+.Ft "char *"
+.Fn evbuffer_readline "struct evbuffer *buf"
+.Sh DESCRIPTION
+These functions retrieve and process line delimited data from an
+.Vt evbuffer .
+An optional callback function is set using
+.Xr evbuffer_setcb 3
+to inform programs about changes in buffer size.
+.Pp
+.Fn evbuffer_readln
+copies a single line of text data delimited by the end-of-line marker
+.Fa eol_style
+from the
+.Vt evbuffer
+structure
+.Fa buf
+to a heap allocated pointer and drains that line from the buffer.
+The function arguments are as follows:
+.Bl -tag -width "eol_style"
+.It Fa buf
+A pointer to the
+.Vt evbuffer
+structure to read from.
+If
+.Fa buf
+is
+.Dv NULL ,
+the function causes undefined behavior.
+.It Fa read_out
+An optional pointer programs can pass to store the number of bytes drained
+from the buffer.
+.It Fa eol_style
+The
+.Vt enum evbuffer_eol_style
+defines four possible values for the
+.Fa eol_style
+argument:
+.Pp
+.Bl -tag -compact -width Ds
+.It Fa EVBUFFER_EOL_ANY
+Any sequence of carriage return
+.Sq \er
+or newline
+.Sq \en
+characters is considered an end-of-line marker.
+This is useful for programs that handle input from various sources with
+different end-of-line styles.
+.It Fa EVBUFFER_EOL_CRLF
+A line is considered to end with a newline character
+.Sq \en
+optionally preceded by a carriage return
+.Sq \er .
+This is a common end-of-line style used by text-based internet protocols like
+HTTP and SMTP.
+.It Fa EVBUFFER_EOL_CRLF_STRICT
+A line must end with a carriage return followed by a newline character
+.Sq \er\en
+exactly.
+.It Fa EVBUFFER_EOL_LF
+A line must end with a newline character
+.Sq \en
+only.
+This style is used in UNIX-like operating systems and some text protocols.
+.El
+.El
+.Pp
+.Fn evbuffer_readline
+copies a single line of text data from the
+.Vt evbuffer
+structure
+.Fa buf
+to a heap allocated pointer and drains that line from the buffer.
+The line is expected to be terminated by either a newline
+.Sq \en
+or a carriage return
+.Sq \er
+character or a combination of both.
+If
+.Fa buf
+is
+.Dv NULL
+the function causes undefined behavior.
+.Sh RETURN VALUES
+These functions return a heap-allocated pointer to the copied string upon
+success and
+.Dv NULL
+upon a memory allocation error
+.Em or
+if an end-of-line marker is not found.
+.Pp
+The functions overload the semantics of a
+.Dv NULL
+return value for both error conditions.
+It may be difficult for the caller to differentiate between a memory
+allocation failure and the absence of an end-of-line character in the buffer.
+.Sh EXAMPLES
+A program could detect a memory allocation error in these functions by
+checking the data length before and after the function is invoked.
+.Bd -literal -offset indent
+/* Store the initial length of the buffer */
+size_t old_len = EVBUFFER_LENGTH(buffer);
+char *line = evbuffer_readline(buffer);
+
+if (line == NULL) {
+	if (old_len == EVBUFFER_LENGTH(buffer)) {
+		/* No data drained; memory allocation error */
+		perror("Memory alloc error in evbuffer_readline");
+	} else {
+		/* Buffer length changed; end-of-line not found */
+		printf("End-of-line not found\en");
+    }
+} else {
+	/* Successfully retrieved a line from the buffer */
+	printf("Retrieved line: %s\en", line);
+	free(line);
+}
+.Ed
+.Sh DIAGNOSTICS
+These functions use the log notification callback API configured with
+.Xr event_set_log_callback 3 .
+.Pp
+The functions can trigger a
+.Em warning notification
+message on a memory allocation error, that has distinct semantics to an
+.Em error notification
+used in the majority of event library functions that use this mechanism and
+encounter such a problem.
+.Pp
+The warning is non-fatal and for
+.Fn evbuffer_readln
+reports:
+.Bd -literal -offset indent
+evbuffer_readln: out of memory: $strerror
+.Ed
+.Pp
+or for
+.Fn evbuffer_readline :
+.Bd -literal -offset indent
+evbuffer_readline: out of memory: $strerror
+.Ed
+.Pp
+Meaning an internal call to
+.Xr malloc 3
+was unable to allocate memory and
+.Va errno
+is set.
+Where
+.Va $strerror
+matches the error string from
+.Xr strerror 3 .
+.Sh ERRORS
+.Fn evbuffer_readline
+uses the C library function
+.Xr malloc 3
+to allocate memory internally;
+.Va errno
+values are preserved if it encounters a problem.
+.Sh SEE ALSO
+.Xr evbuffer_drain 3 ,
+.Xr EVBUFFER_LENGTH 3 ,
+.Xr evbuffer_new 3 ,
+.Xr malloc 3
+.Sh HISTORY
+.Fn evbuffer_readln
+first appeared in libevent-2.0.1 and was backported for upstream release in
+libevent-1.4.14b but was available earlier in
+.Ox 3.8 .
+.Pp
+.Fn evbuffer_readline
+first appeared in libevent-1.0d and has been available since
+.Ox 3.8 .
+.Sh AUTHORS
+.An -nosplit
+.An Nick Mathewson
+wrote
+.Fn evbuffer_readln
+and
+.An Niels Provos
+wrote
+.Fn evbuffer_readline .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh CAVEATS
+.Fn evbuffer_readline
+is deprecated in libevent 2.x and newer versions.
