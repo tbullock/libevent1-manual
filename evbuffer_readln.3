@@ -57,12 +57,11 @@ is
 .Dv NULL ,
 the function causes undefined behavior.
 .It Fa read_out
-An optional pointer programs can pass to store the number of bytes drained
-from the buffer.
+An optional pointer to store the number of bytes drained from the buffer.
 .It Fa eol_style
 The
 .Vt enum evbuffer_eol_style
-defines four possible values for the
+defines these possible values for the
 .Fa eol_style
 argument:
 .Pp
@@ -118,7 +117,7 @@ upon a memory allocation error
 .Em or
 if an end-of-line marker is not found.
 .Pp
-The functions overload the semantics of a
+The functions overload the meaning of a
 .Dv NULL
 return value for both error conditions.
 It may be difficult for the caller to differentiate between a memory
@@ -149,12 +148,14 @@ if (line == NULL) {
 These functions use the log notification callback API configured with
 .Xr event_set_log_callback 3 .
 .Pp
-The functions can trigger a
-.Em warning notification
-message on a memory allocation error, that has distinct semantics to an
-.Em error notification
-used in the majority of event library functions that use this mechanism and
-encounter such a problem.
+The functions generate
+.Em warning
+notification logs from memory allocation errors.
+Unlike
+.Em error
+notifications, warnings are non-fatal.
+Most event library functions which use the log callback, report errors for
+memory allocation faults.
 .Pp
 The warning is non-fatal and for
 .Fn evbuffer_readln
@@ -163,18 +164,17 @@ reports:
 evbuffer_readln: out of memory: $strerror
 .Ed
 .Pp
-or for
+For
 .Fn evbuffer_readline :
 .Bd -literal -offset indent
 evbuffer_readline: out of memory: $strerror
 .Ed
 .Pp
-Meaning an internal call to
+This means an internal call to
 .Xr malloc 3
 was unable to allocate memory and
 .Va errno
-is set.
-Where
+is set, where
 .Va $strerror
 matches the error string from
 .Xr strerror 3 .
