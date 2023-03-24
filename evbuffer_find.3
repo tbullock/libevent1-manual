@@ -1,0 +1,79 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt EVBUFFER_FIND 3
+.Os
+.Sh NAME
+.Nm evbuffer_find
+.Nd search an evbuffer for a byte sequence
+.Sh SYNOPSIS
+.In sys/types.h
+.In event.h
+.Ft "u_char *"
+.Fn evbuffer_find "struct evbuffer *buf" "const u_char *what" "size_t len"
+.Sh DESCRIPTION
+This function locates the first occurrence of byte sequence
+.Fa what
+in the
+.Vt evbuffer
+structure
+.Fa buf .
+The number of bytes in the sequence is denoted by the the argument
+.Fa len .
+.Pp
+If either
+.Fa buf
+or
+.Fa what
+is
+.Dv NULL
+or the buffer is empty, the function causes undefined behavior.
+If the value of
+.Fa len
+is zero, it signifies an empty byte sequence.
+This is an invalid input for searching within the buffer and will not result
+in any matches.
+.Sh RETURN VALUES
+.Fn evbuffer_find
+returns a pointer to the first occurrence of the specified byte sequence
+within the
+.Vt evbuffer .
+If the sequence is not found or
+.Fa len
+is zero, the function returns NULL.
+.Pp
+The returned pointer remains valid if and only if the buffer is unmodified.
+.\" .Sh EXAMPLES
+.Sh SEE ALSO
+.Xr evbuffer_add 3 ,
+.Xr evbuffer_new 3
+.Sh HISTORY
+This function first appeared in libevent-0.8 and has been available since
+.Ox 3.6 .
+.Sh AUTHORS
+.Fn evbuffer_find
+was written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh CAVEATS
+.Fn evbuffer_find
+returns a pointer to an internal array within the
+.Vt evbuffer
+structure.
+This behavior is not a promised feature of the evbuffer API.
