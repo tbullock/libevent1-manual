@@ -128,7 +128,7 @@ checking the data length before and after the function is invoked.
 .Bd -literal -offset indent
 /* Store the initial length of the buffer */
 size_t old_len = EVBUFFER_LENGTH(buffer);
-char *line = evbuffer_readline(buffer);
+char *line = evbuffer_readln(buffer, NULL, EVBUFFER_EOL_ANY);
 
 if (line == NULL) {
 	if (old_len == EVBUFFER_LENGTH(buffer)) {
@@ -137,7 +137,7 @@ if (line == NULL) {
 	} else {
 		/* Buffer length changed; end-of-line not found */
 		printf("End-of-line not found\en");
-    }
+	}
 } else {
 	/* Successfully retrieved a line from the buffer */
 	printf("Retrieved line: %s\en", line);
