@@ -49,6 +49,17 @@ Formatted data is added using the functions
 or
 .Fn evbuffer_add_vprintf .
 .Pp
+The event library
+.Sy bufferevent
+API is an abstraction built on top of the
+.Sy evbuffer
+API and the core event loop functionality of the library to provide
+asynchronous, buffered I/O.
+A detailed explanation of
+.Sy bufferevents
+is available in
+.Xr bufferevent_new 3 .
+.Pp
 If an
 .Vt evbuffer
 has insufficient space, these functions allocate new memory dynamically using
@@ -157,6 +168,7 @@ to implement their functionality;
 .Va errno
 values are preserved if it encounters a problem.
 .Sh SEE ALSO
+.Xr bufferevent_new 3 ,
 .Xr evbuffer_expand 3 ,
 .Xr evbuffer_new 3 ,
 .Xr evbuffer_setcb 3 ,
