@@ -211,6 +211,29 @@ wrote
 .Pp
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
-.Sh CAVEATS
+.Sh BUGS
+.Fn evbuffer_readline
+is not capable of safely handling an
+.Sq \er\en
+.Pq CRLF
+sequence split over two reads.
+.Pp
+This issue arises because the function scans the buffer for the first
+occurrence of either
+.Sq \er
+or
+.Sq \en
+and assumes it as the end of the line.
+If the
+.Sq \er
+and
+.Sq \en
+characters are split over two reads, the function treats them as two separate
+line endings, leading to incorrect parsing of the data.
+.Pp
+Consider using the more robust line parsing function
+.Fn evbuffer_readln
+that can handle CRLF sequences split over multiple reads.
+.Pp
 .Fn evbuffer_readline
 is deprecated in libevent 2.x and newer versions.
