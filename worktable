@@ -95,17 +95,17 @@ Ted: TTD; has internal list of things to adjust
 | evbuffer_add_buffer            | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
 | evbuffer_add_printf            | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
 | evbuffer_add_vprintf           | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
-| evbuffer_drain                 | Yes | evbuffer_remove.3          | No   |      | RA    |      |     |                                         |
-| evbuffer_expand                | Yes | evbuffer_expand.3          | No   |      |       | RA   |     |                                         |
-| evbuffer_find                  | Yes | evbuffer_find.3            | No   |      |       |      |     |                                         |
+| evbuffer_drain                 | Yes | evbuffer_remove.3          | No   |      | RA    | OK   |     |                                         |
+| evbuffer_expand                | Yes | evbuffer_expand.3          | No   |      |       | OK   |     |                                         |
+| evbuffer_find                  | Yes | evbuffer_find.3            | No   |      |       | OK   |     |                                         |
 | evbuffer_free                  | Yes | evbuffer_new.3             | No   |      |       |      | RDY |                                         |
 | evbuffer_new                   | Yes | evbuffer_new.3             | No   |      |       |      | RDY | Verify History section                  |
-| evbuffer_read                  | Yes | evbuffer_read.3            | No   |      |       | RA   |     |                                         |
+| evbuffer_read                  | Yes | evbuffer_read.3            | No   |      |       | OK   |     |                                         |
 | evbuffer_readline              | Yes | evbuffer_readln.3          | No   |      |       |      |     |                                         |
 | evbuffer_readln                | Yes | evbuffer_readln.3          | No   |      |       |      |     |                                         |
-| evbuffer_remove                | Yes | evbuffer_remove.3          | No   |      |       |      |     |                                         |
+| evbuffer_remove                | Yes | evbuffer_remove.3          | No   |      |       | OK   |     |                                         |
 | evbuffer_setcb                 | Yes | evbuffer_new.3             | No   |      |       |      | RDY |                                         |
-| evbuffer_write                 | Yes | evbuffer_read.3            | No   |      |       | RA   |     |                                         |
+| evbuffer_write                 | Yes | evbuffer_read.3            | No   |      |       | OK   |     |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_asr_abort                | Yes |                            | No   |      |       |      |     |                                         |
 | event_asr_run                  | Yes |                            | No   |      |       |      |     |                                         |
