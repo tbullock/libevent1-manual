@@ -109,6 +109,11 @@ If
 is
 .Dv NULL
 the function causes undefined behavior.
+.Pp
+Note that
+.Fn evbuffer_readline
+cannot always be used safely, see
+.Sx BUGS .
 .Sh RETURN VALUES
 These functions return a heap-allocated pointer to the copied string upon
 success and
