@@ -1,0 +1,367 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt BUFFEREVENT_NEW 3
+.Os
+.Sh NAME
+.Nm bufferevent_new ,
+.Nm bufferevent_free ,
+.Nm bufferevent_base_set ,
+.Nm bufferevent_setcb ,
+.Nm bufferevent_setfd ,
+.Nm bufferevent_priority_set
+.Nd bufferevent configuration
+.Sh SYNOPSIS
+.In event.h
+.Ft typedef void
+.Fo (*evbuffercb)
+.Fa "struct bufferevent *"
+.Fa "void *"
+.Fc
+.Ft typedef void
+.Fo (*everrorcb)
+.Fa "struct bufferevent *"
+.Fa "short"
+.Fa "void *"
+.Fc
+.Ft struct bufferevent *
+.Fo bufferevent_new
+.Fa "int fd"
+.Fa "evbuffercb readcb"
+.Fa "evbuffercb writecb"
+.Fa "everrorcb errorcb"
+.Fa "void *cbarg"
+.Fc
+.Ft void
+.Fn bufferevent_free "struct bufferevent *bufev"
+.Ft int
+.Fo bufferevent_base_set
+.Fa "struct event_base *base"
+.Fa "struct bufferevent *bufev"
+.Fc
+.Ft void
+.Fo bufferevent_setcb
+.Fa "struct bufferevent *bufev"
+.Fa "evbuffercb readcb"
+.Fa "evbuffercb writecb"
+.Fa "everrorcb errorcb"
+.Fa "void *cbarg"
+.Fc
+.Ft void
+.Fn bufferevent_setfd "struct bufferevent *bufev" "int fd"
+.Ft int
+.Fn bufferevent_priority_set "struct bufferevent *bufev" "int priority"
+.Fd #define EVBUFFER_READ	0x01
+.Fd #define EVBUFFER_WRITE	0x02
+.Fd #define EVBUFFER_EOF	0x10
+.Fd #define EVBUFFER_ERROR	0x20
+.Fd #define EVBUFFER_TIMEOUT	0x40
+.Sh DESCRIPTION
+The
+.Sy bufferevent
+API is an abstraction built on top of the asynchronous event loop and
+.Sy evbuffer
+components of the event library, providing buffered I/O functionality.
+Designed to handle both reading and writing operations on a socket,
+the API automatically buffers the data to be sent or received.
+It integrates with an initialized
+.Vt event_base
+structure and invokes optional user-defined callbacks for I/O events.
+.Pp
+For each socket or file descriptor being monitored, the API requires a new
+.Vt bufferevent
+structure to be configured.
+Each
+.Vt bufferevent
+maintains its own input and output buffers, as well as read, write, and error
+event callbacks.
+It is advised for calling programs to define at least the read and error
+callbacks to properly handle incoming data and react to errors or
+disconnections.
+.Pp
+As discussed in
+.Xr event_base_loop 3 ,
+event states are categorized as
+.Sy initialized ,
+.Sy scheduled
+or
+.Sy activated .
+The
+.Sy bufferevent
+API
+categorizes a
+.Vt bufferevent
+structure into these states as follows:
+.Bl -tag -width "Initialized:"
+.It Sy Initialized :
+When a
+.Vt bufferevent
+structure is created using
+.Fn bufferevent_new ,
+the read and write events associated with the file descriptor are configured
+but not yet registered with an event loop.
+.Fn bufferevent_base_set
+can assign the structure to an
+.Vt event_base ,
+otherwise the API assumes the program was initialized using
+.Xr event_init 3 .
+.It Sy Scheduled :
+After initializing a
+.Vt bufferevent ,
+the structure is registered with an event loop using
+.Xr bufferevent_enable 3 .
+In this state, the events are idle, waiting for their respective triggers.
+The function
+.Xr bufferevent_write 3
+implicitly schedules write events.
+.It Sy Activated :
+When the read or write events are triggered
+.Po
+due to data being available to read or buffer space being available to write
+.Pc , they become activated.
+The event loop processes these activated events, invoking the corresponding
+user-defined callbacks (read, write, or error) as necessary.
+.El
+.Pp
+.Fn bufferevent_new
+creates a
+.Vt bufferevent
+structure for I/O operations on a given file descriptor.
+The function arguments are specified as follows:
+.Bl -tag -width "writecb:"
+.It Fa fd :
+An open file descriptor
+.Pq typically a socket
+set to non-blocking mode
+.Dv O_NONBLOCK
+via
+.Xr fcntl 2 .
+.It Fa readcb :
+.Vt evbuffercb
+callback for read events.
+.It Fa writecb :
+.Vt evbuffercb
+callback for write events.
+.It Fa errorcb :
+.Vt everrorcb
+callback for error events.
+.It Fa cbarg :
+User-defined pointer that is passed to callback functions when triggered.
+.El
+.Pp
+The callback function type
+.Fn evbuffercb
+is used for read and write events.
+These callbacks are invoked when there is data available to read or when the
+output buffer is drained.
+.Fn evbuffercb
+function parameters are a pointer to the
+.Vt bufferevent
+structure associated with the file descriptor that triggered the event, and a
+user-defined pointer configured with
+.Fn bufferevent_new .
+.Pp
+.Fn everrorcb
+is a user-defined error callback function supplied to
+.Fa errorcb
+and activated for error events, connection closures, and timeouts.
+The function parameter types include:
+.Bl -tag -width "8n"
+.It Fa struct bufferevent * :
+A pointer to the bufferevent structure associated with the file descriptor
+that triggered the event.
+.It Fa short :
+A bitmask of flags indicating the type of event that occurred,
+the possible values include:
+.Bl -tag -width "EVBUFFER_TIMEOUT" -compact
+.It Dv EVBUFFER_READ
+The event occurred while attempting to read from the file descriptor.
+.It Dv EVBUFFER_WRITE
+The event occurred while attempting to write to the file descriptor.
+.It Dv EVBUFFER_EOF
+Indicates that the end of file or connection closure was reached during a
+read or write operation.
+.It Dv EVBUFFER_ERROR
+Signifies that an error occurred during a read or write operation.
+.It Dv EVBUFFER_TIMEOUT
+Represents that a timeout occurred while waiting for a read or write operation
+to complete.
+.El
+.It Fa "void *" :
+User-defined pointer configured with
+.Fn bufferevent_new .
+.El
+.Pp
+.Fn bufferevent_free
+releases memory associated with a
+.Vt bufferevent
+structure.
+The function causes undefined behavior if
+.Fa bufev
+is
+.Dv NULL .
+.Pp
+.Fn bufferevent_base_set
+assigns the
+.Vt bufferevent
+structure
+.Fa bufev
+to the initialized
+.Vt event_base
+structure
+.Fa base
+returned by
+.Xr event_base_new 3
+or
+.Xr event_init 3 .
+If this function is not invoked, the API assumes that the event library was
+initialized by
+.Xr event_init 3
+and relies on internal global library variables.
+All
+.Sy bufferevent
+functions except for
+.Fn bufferevent_new
+cause undefined behavior if invoked without initializing the library.
+If
+.Fa bufev
+or
+.Fa base
+is
+.Dv NULL
+the function causes a segmentation fault.
+.Pp
+.Fn bufferevent_setcb
+is used to set or update the callback functions and the user-defined argument
+associated with a
+.Vt bufferevent
+structure
+.Fa bufev .
+The function arguments
+.Fa readcb ,
+.Fa writecb ,
+.Fa errorcb
+and
+.Fa cbarg
+are equivalanet to arguments for
+.Fn bufferevent_new .
+.Pp
+.Fn bufferevent_setfd
+is used to update the file descriptor
+.Fa fd
+associated with a
+.Vt bufferevent
+structure
+.Fa bufev .
+This function is helpful for reinitializing an existing
+.Vt bufferevent
+with a new file descriptor after closing a connection and opening a new one.
+Read and write events are deleted for the old file descriptor and new events
+are configured.
+To re-schedule the
+.Vt bufferevent
+use
+.Xr bufferevent_enable 3 .
+If
+.Fa bufev
+is
+.Dv NULL
+the function causes undefined behavior.
+.Pp
+.Fn bufferevent_priority_set
+is used to set the priority of the read and write events associated with a
+.Vt bufferevent
+structure
+.Fa bufev .
+This allows programs to prioritize the processing of a
+.Vt bufferevent
+over others, ensuring that more important events are processed first.
+The behavior is undefined if
+.Va bufev
+is
+.Dv NULL .
+The integer argument
+.Fa priority
+represents the queue number to be assigned to the read and write
+events associated with the
+.Vt bufferevent .
+Valid
+.Fa priority
+values start at zero
+.Pq highest priority
+and go up to the number of queues minus one, as configured using
+.Xr event_base_priority_init 3 .
+.Pp
+The default priority for events, including those associated with bufferevent
+structures, is set to the middle value of the available priority queues.
+This is calculated by dividing the total integer number of queues
+.Pq configured using Xr event_base_priority_init 3
+by two.
+If the number of queues is not explicitly set, the default number of queues is
+one, and the default priority for events will be zero.
+.Sh RETURN VALUES
+.Fn bufferevent_new
+returns a pointer to a
+.Vt bufferevent
+data structure upon success, and returns
+.Dv NULL
+upon failure.
+.Va errno
+is preserved.
+.Pp
+.Fn bufferevent_base_set
+returns 0 if invoked while
+.Fa bufev
+is an
+.Sy initialized
+.Vt bufferevent
+structure; otherwise the value \-1 is returned.
+.Pp
+.Fn bufferevent_priority_set
+returns the value 0 if successful; otherwise the value \-1 is returned.
+.\" .Sh EXAMPLES
+.Sh ERRORS
+On failure
+.Fn bufferevent_new
+preserves
+.Va errno
+values set equivalent to
+.Xr calloc 3
+or
+.Xr evbuffer_new 3 .
+.Pp
+The remaining functions do not set
+.Va errno
+upon failure.
+.Sh SEE ALSO
+.Xr bufferevent_enable 3 ,
+.Xr bufferevent_read 3 ,
+.Xr bufferevent_settimeout 3 ,
+.Xr evbuffer_new 3 ,
+.Xr event_base_loop 3 ,
+.Xr event_base_new 3 ,
+.Xr event_base_priority_init 3 ,
+.Xr event_priority_set 3
+.Sh HISTORY
+These functions first appeared in libevent-0.8 and have been available since
+.Ox 3.6 .
+.Sh AUTHORS
+These functions were written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
