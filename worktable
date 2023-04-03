@@ -74,38 +74,38 @@ Ted: TTD; has internal list of things to adjust
 | evtimer_pending                | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
 | evtimer_initialized            | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| bufferevent_base_set           | Yes |                            | No   |      |       |      |     |                                         |
+| bufferevent_base_set           | Yes | bufferevent_new.3          | No   |      |       |      |     |                                         |
 | bufferevent_disable            | Yes |                            | No   |      |       |      |     |                                         |
 | bufferevent_enable             | Yes |                            | No   |      |       |      |     |                                         |
-| bufferevent_free               | Yes |                            | No   |      |       |      |     |                                         |
-| bufferevent_new                | Yes |                            | No   |      |       |      |     |                                         |
-| bufferevent_priority_set       | Yes |                            | No   |      |       |      |     |                                         |
+| bufferevent_free               | Yes | bufferevent_new.3          | No   |      |       |      |     |                                         |
+| bufferevent_new                | Yes | bufferevent_new.3          | No   |      |       |      |     | Double check niels wrote all these      |
+| bufferevent_priority_set       | Yes | bufferevent_new.3          | No   |      |       |      |     |                                         |
 | bufferevent_read               | Yes |                            | No   |      |       |      |     |                                         |
-| bufferevent_read_pressure_cb   | Yes |                            | No   |      |       |      |     |                                         |
-| bufferevent_setcb              | Yes |                            | No   |      |       |      |     |                                         |
-| bufferevent_setfd              | Yes |                            | No   |      |       |      |     |                                         |
-| bufferevent_settimeout         | Yes |                            | No   |      |       |      |     |                                         |
-| bufferevent_setwatermark       | Yes |                            | No   |      |       |      |     |                                         |
+| bufferevent_read_pressure_cb   | Yes | bufferevent_setwatermark.3 | No   |      |       |      |     |                                         |
+| bufferevent_setcb              | Yes | bufferevent_new.3          | No   |      |       |      |     |                                         |
+| bufferevent_setfd              | Yes | bufferevent_new.3          | No   |      |       |      |     |                                         |
+| bufferevent_settimeout         | Yes | bufferevent_settimeout.3   | No   |      |       |      |     |                                         |
+| bufferevent_setwatermark       | Yes | bufferevent_setwatermark.3 | No   |      |       |      |     |                                         |
 | bufferevent_write              | Yes |                            | No   |      |       |      |     |                                         |
 | bufferevent_write_buffer       | Yes |                            | No   |      |       |      |     |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | encode_int                     | Yes |                            |      |      |       |      |     |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
-| evbuffer_add                   | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
-| evbuffer_add_buffer            | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
-| evbuffer_add_printf            | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
-| evbuffer_add_vprintf           | Yes | evbuffer_add.3             | No   |      |       |      |     |                                         |
-| evbuffer_drain                 | Yes | evbuffer_remove.3          | No   |      | RA    | OK   |     |                                         |
-| evbuffer_expand                | Yes | evbuffer_expand.3          | No   |      |       | OK   |     |                                         |
-| evbuffer_find                  | Yes | evbuffer_find.3            | No   |      |       | OK   |     |                                         |
+| evbuffer_add                   | Yes | evbuffer_add.3             | No   |      |       | OK   | RDY |                                         |
+| evbuffer_add_buffer            | Yes | evbuffer_add.3             | No   |      |       | OK   | RDY |                                         |
+| evbuffer_add_printf            | Yes | evbuffer_add.3             | No   |      |       | OK   | RDY |                                         |
+| evbuffer_add_vprintf           | Yes | evbuffer_add.3             | No   |      |       | OK   | RDY |                                         |
+| evbuffer_drain                 | Yes | evbuffer_remove.3          | No   |      | RA    | OK   | RDY |                                         |
+| evbuffer_expand                | Yes | evbuffer_expand.3          | No   |      |       | OK   | RDY |                                         |
+| evbuffer_find                  | Yes | evbuffer_find.3            | No   |      |       | OK   | RDY |                                         |
 | evbuffer_free                  | Yes | evbuffer_new.3             | No   |      |       |      | RDY |                                         |
-| evbuffer_new                   | Yes | evbuffer_new.3             | No   |      |       |      | RDY | Verify History section                  |
-| evbuffer_read                  | Yes | evbuffer_read.3            | No   |      |       | OK   |     |                                         |
-| evbuffer_readline              | Yes | evbuffer_readln.3          | No   |      |       |      |     |                                         |
-| evbuffer_readln                | Yes | evbuffer_readln.3          | No   |      |       |      |     |                                         |
-| evbuffer_remove                | Yes | evbuffer_remove.3          | No   |      |       | OK   |     |                                         |
+| evbuffer_new                   | Yes | evbuffer_new.3             | No   |      |       |      | RDY |                                         |
+| evbuffer_read                  | Yes | evbuffer_read.3            | No   |      |       | OK   | RDY |                                         |
+| evbuffer_readline              | Yes | evbuffer_readln.3          | No   |      |       |      | RDY |                                         |
+| evbuffer_readln                | Yes | evbuffer_readln.3          | No   |      |       |      | RDY |                                         |
+| evbuffer_remove                | Yes | evbuffer_remove.3          | No   |      |       | OK   | RDY |                                         |
 | evbuffer_setcb                 | Yes | evbuffer_new.3             | No   |      |       |      | RDY |                                         |
-| evbuffer_write                 | Yes | evbuffer_read.3            | No   |      |       | OK   |     |                                         |
+| evbuffer_write                 | Yes | evbuffer_read.3            | No   |      |       | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | event_asr_abort                | Yes |                            | No   |      |       |      |     |                                         |
 | event_asr_run                  | Yes |                            | No   |      |       |      |     |                                         |
