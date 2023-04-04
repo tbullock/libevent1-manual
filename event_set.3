@@ -226,6 +226,19 @@ and
 correspond to
 .Fn event_add .
 .Pp
+If
+.Fn event_add
+is called again with a new or updated timeout value before the event trigger
+is processed, the function:
+.Bl -enum
+.It
+Unschedules the existing timeout if it exists.
+.It
+Sets a new timeout starting from when the function was most recently invoked.
+.It
+Reschedules the event with the event loop.
+.El
+.Pp
 .Fn event_del
 removes an event from an event loop.
 The
