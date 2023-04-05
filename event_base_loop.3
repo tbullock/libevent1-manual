@@ -65,7 +65,7 @@ The event library further categorizes event states as:
 .It Sy Initialized :
 These have been configured with
 .Xr event_set 3
-but not yet registered with an event loop.
+and not yet registered with an event loop.
 .It Sy Scheduled :
 These are registered to a loop using
 .Xr event_add 3
@@ -108,7 +108,7 @@ the event loop.
 .It
 .Dv EVLOOP_NONBLOCK :
 Run the event loop in non-blocking mode.
-The loop returns after processing activated signal and kernel events but does
+The loop returns after processing activated signal and kernel events and does
 not wait for timer events to expire.
 .El
 .El

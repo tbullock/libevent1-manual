@@ -84,11 +84,9 @@ was called
 .Pc .
 .Pp
 .Fn event_priority_init
-is equivalent to
+behaves similar to
 .Fn event_base_priority_init
-but removes the
-.Va base
-argument and requires that the library was initialized with
+and requires that the library was initialized with
 .Xr event_init 3 .
 .Pp
 By default, the functions
