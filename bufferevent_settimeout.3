@@ -77,16 +77,13 @@ This function was written by
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
 .Sh CAVEATS
-Due to an API design oversight
 .Fn bufferevent_settimeout
-can fail without directly notifying the caller because the return type is
-.Ft void ;
-.Va errno
-is not necessarily set on failure.
-Instead the program is terminated by invoking
+has an API design limitation: it returns
+.Ft void
+and does not directly notify the caller when it fails.
+On failure, the program terminates by calling
 .Xr exit 3
-with a status of 1 .
+with a status of 1.
 .Pp
-See
-.Xr event_add 3
-for details diagnosing failures.
+For more information on diagnosing failures, refer to
+.Xr event_add 3 .
