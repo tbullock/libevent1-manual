@@ -44,8 +44,7 @@ or the buffer is empty, the function causes undefined behavior.
 If the value of
 .Fa len
 is zero, it signifies an empty byte sequence.
-This is an invalid input for searching within the buffer and will not result
-in any matches.
+This is an invalid input for searching within the buffer.
 .Sh RETURN VALUES
 .Fn evbuffer_find
 returns a pointer to the first occurrence of the specified byte sequence

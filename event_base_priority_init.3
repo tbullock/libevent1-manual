@@ -37,7 +37,7 @@ executed so that the most important events are processed first.
 When enabled, the event library stores events in multiple queues of different
 priority, executing events in lower numbered queues before events in higher
 numbered queues.
-When processing an active queue, the library will check for new events that
+When processing an active queue, the library checks for new events that
 were added to lower numbered queues before moving on to a higher numbered
 queue.
 .Pp
@@ -73,10 +73,10 @@ A positive integer value greater than or equal to one.
 The behavior is undefined if the value is less than or equal to zero.
 If
 .Va npriorities
-is the same as the current number of queues, no changes will be made.
+is the same as the current number of queues, no changes are made.
 .El
 .Pp
-The function will fail if executed with active events in the event queues
+The function fails if executed with active events in the event queues
 .Po
 that is, after
 .Xr event_dispatch 3
@@ -124,7 +124,7 @@ from the call to
 the default number of queues is one.
 .El
 .Pp
-The function will fail if the event has already been scheduled with
+The function fails if the event has already been scheduled with
 .Xr event_add 3
 or the value of
 .Fa pri
@@ -147,11 +147,11 @@ can report and what they mean:
 .Bl -tag -width Ds
 .It Dq event_base_priority_init: calloc
 The library failed to allocate memory for the list of event queues.
-The program will terminate by calling
+The program terminates by calling
 .Xr exit 3 .
 .It Dq event_base_priority_init: malloc
 The library failed to allocate memory for at least one event queue.
-The program will terminate by calling
+The program terminates by calling
 .Xr exit 3 .
 .El
 .Sh SEE ALSO
@@ -162,7 +162,7 @@ The program will terminate by calling
 These functions first appeared in libevent-1.0 and have been available since
 .Ox 3.8 .
 .Sh AUTHORS
-The event library and these functions were written by
+These functions were written by
 .An -nosplit
 .An Niels Provos .
 .Pp
