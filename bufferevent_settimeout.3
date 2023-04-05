@@ -1,0 +1,92 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt BUFFEREVENT_SETTIMEOUT 3
+.Os
+.Sh NAME
+.Nm bufferevent_settimeout
+.Nd configure bufferevent timeout
+.Sh SYNOPSIS
+.In event.h
+.Ft void
+.Fo bufferevent_settimeout
+.Fa "struct bufferevent *bufev"
+.Fa "int timeout_read"
+.Fa "int timeout_write"
+.Fc
+.Fd #define EVBUFFER_READ	0x01
+.Fd #define EVBUFFER_WRITE	0x02
+.Fd #define EVBUFFER_TIMEOUT	0x40
+.Sh DESCRIPTION
+.Fn bufferevent_settimeout
+sets or updates the read and write timeout durations for the
+.Vt bufferevent
+structure
+.Fa bufev .
+The arguments
+.Fa timeout_read
+and
+.Fa timeout_write
+are the number of seconds to configure each value to.
+The function causes undefined behavior if
+.Va bufev
+is
+.Dv NULL .
+A timeout value of zero removes a timeout event for a
+.Vt bufferevent
+if it exists.
+When a timeout expires, the error callback is triggered with the
+.Dv EVBUFFER_TIMEOUT
+flag enabled.
+.Pp
+If a program attempts to reuse the
+.Vt bufferevent
+data structure for a new file descriptor with
+.Xr bufferevent_setfd 3 ,
+any previously set timeouts still apply to the new file descriptor.
+This is because the timeout settings are associated with the
+.Vt bufferevent
+structure, not the file descriptor itself.
+.Pp
+Negative timeout values cause undefined behavior.
+.Sh SEE ALSO
+.Xr bufferevent_enable 3 ,
+.Xr bufferevent_new 3 ,
+.Xr bufferevent_setfd 3
+.Sh HISTORY
+This function first appeared in libevent-0.8 and has been available since
+.Ox 3.6 .
+.Sh AUTHORS
+This function was written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh CAVEATS
+Due to an API design oversight
+.Fn bufferevent_settimeout
+can fail without directly notifying the caller because the return type is
+.Ft void ;
+.Va errno
+is not necessarily set on failure.
+Instead the program is terminated by invoking
+.Xr exit 3
+with a status of 1 .
+.Pp
+See
+.Xr event_add 3
+for details diagnosing failures.
