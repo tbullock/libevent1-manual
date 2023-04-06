@@ -259,10 +259,10 @@ Encountered an unknown queue number, indicated by
 in hexadecimal format.
 .El
 .Sh ERRORS
-The event library usually does not set
+The event library, rather than setting
 .Xr errno 2 ,
-but instead has its own system to
-issue messages via callbacks which is configured with
+often employs an alternative system to issue messages through callbacks.
+This system is configured using
 .Xr event_set_log_callback 3 .
 .Sh SEE ALSO
 .Xr fork 2 ,
