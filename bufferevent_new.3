@@ -64,11 +64,6 @@
 .Fn bufferevent_setfd "struct bufferevent *bufev" "int fd"
 .Ft int
 .Fn bufferevent_priority_set "struct bufferevent *bufev" "int priority"
-.Fd #define EVBUFFER_READ	0x01
-.Fd #define EVBUFFER_WRITE	0x02
-.Fd #define EVBUFFER_EOF	0x10
-.Fd #define EVBUFFER_ERROR	0x20
-.Fd #define EVBUFFER_TIMEOUT	0x40
 .Sh DESCRIPTION
 The
 .Sy bufferevent
@@ -288,7 +283,7 @@ structure
 .Fa bufev .
 This allows programs to prioritize the processing of a
 .Vt bufferevent
-over others, ensuring that more important events are processed first.
+over other events, ensuring that more important events are processed first.
 The behavior is undefined if
 .Va bufev
 is
@@ -298,20 +293,11 @@ The integer argument
 represents the queue number to be assigned to the read and write
 events associated with the
 .Vt bufferevent .
-Valid
-.Fa priority
-values start at zero
-.Pq highest priority
-and go up to the number of queues minus one, as configured using
-.Xr event_base_priority_init 3 .
 .Pp
-The default priority for events, including those associated with bufferevent
-structures, is set to the middle value of the available priority queues.
-This is calculated by dividing the total integer number of queues
-.Pq configured using Xr event_base_priority_init 3
-by two.
-If the number of queues is not explicitly set, the default number of queues is
-one, and the default priority for events is zero.
+Queue numbers are configured using
+.Xr event_base_priority_init 3 .
+An explanation of the event library priority system is detailed in that manual
+page.
 .Sh RETURN VALUES
 .Fn bufferevent_new
 returns a pointer to a
