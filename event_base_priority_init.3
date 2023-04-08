@@ -35,16 +35,14 @@ The library allows programs to control the order in which events are
 executed so that the most important events are processed first.
 .Pp
 When enabled, the event library stores events in multiple queues of different
-priority, executing events in lower numbered queues before events in higher
-numbered queues.
-When processing an active queue, the library checks for new events that
-were added to lower numbered queues before moving on to a higher numbered
-queue.
+priority, executing activated events in lower numbered queues before events
+in higher numbered queues.
+After processing activated events with a given queue number, the library
+checks for new events that were added to lower numbered queues before moving
+on to a higher numbered queue.
 .Pp
 Under high load situations, events in lower numbered queues may consume most
-of the processing time and starve higher numbered ones, so it is important to
-carefully consider the priorities of events to ensure that critical events are
-processed promptly.
+of the processing time and starve higher numbered ones.
 .Pp
 The function
 .Fn event_base_priority_init
@@ -53,7 +51,7 @@ is used to configure the number of prioritized queues assigned to an
 structure.
 This function is designed to be called before a program calls
 .Xr event_set 3
-for the first time.
+for the first time, otherwise inconsistent prioritization may occur.
 The arguments are as follows:
 .Bl -tag -width "npriorities:"
 .It Va base :
@@ -128,11 +126,7 @@ or the value of
 .Fa pri
 is invalid.
 .Sh RETURN VALUES
-.Fn event_base_priority_init ,
-.Fn event_priority_init
-and
-.Fn event_priority_set
-return the value 0 if successful; otherwise the value \-1 is returned.
+These functions return 0 if successful; otherwise the value \-1 is returned.
 .Sh DIAGNOSTICS
 The event library relies on its own system to issue messages via callbacks
 configured with
