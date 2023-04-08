@@ -23,11 +23,6 @@
 .In event.h
 .Ft void
 .Fn event_active "struct event *ev" "int res" "short ncalls"
-.Fd #define EV_TIMEOUT	0x01
-.Fd #define EV_READ	0x02
-.Fd #define EV_WRITE	0x04
-.Fd #define EV_SIGNAL	0x08
-.Fd #define EV_PERSIST	0x10
 .Sh DESCRIPTION
 Programs may occasionally need to manually trigger events with user-defined
 behavior.
