@@ -1,0 +1,98 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt BUFFEREVENT_SETWATERMARK 3
+.Os
+.Sh NAME
+.Nm bufferevent_setwatermark
+.Nd one line about what it does
+.Sh SYNOPSIS
+.In event.h
+.Ft void
+.Fo bufferevent_setwatermark
+.Fa "struct bufferevent *bufev"
+.Fa "short events"
+.Fa "size_t lowmark"
+.Fa "size_t highmark"
+.Fc
+.Sh DESCRIPTION
+A watermark is an optional user-defined threshold that guides the bufferevent
+API in managing the flow of data in and out of a buffer.
+The reaction to watermark levels is known as back pressure, meaning that the
+library schedules internal read and write operations based on watermark
+values.
+These determine when to read data from the assigned file descriptor and when
+to invoke user-defined callbacks if they exist.
+.Pp
+.Fn bufferevent_setwatermark
+configures the watermark values for the
+.Vt bufferevent
+structure
+.Fa bufev .
+The bitmask
+.Fa events ,
+specifies which operations the settings are applied to
+.Po
+.Dv EV_READ
+and/or
+.Dv EV_WRITE
+.Pc .
+The watermark values are configured with
+.Fa lowmark
+and
+.Fa highmark .
+.Pp
+By default all watermarks are set to zero and the library does not impose any
+buffer size constraints.
+Read operations occur whenever data is available from the assigned file
+descriptor and user-defined callbacks are invoked regardless of the buffer
+length.
+.Pp
+The bufferevent API uses watermarks as follows:
+.Bl -tag -width 2n
+.It Sy Read Operations
+.Bl -tag -width "High:"
+.It Sy High :
+The library attempts to read data repetitively until the buffer length exceeds
+or equals the high watermark.
+The library defers further reading and invocation of the user-defined read
+callback until the buffer length falls below the high watermark.
+.It Sy Low :
+The invocation of the user-defined read callback is deferred until the buffer
+reaches the minimum amount of data specified by the low watermark.
+.El
+.It Sy Write Operations
+.Bl -tag -width "High:"
+.It Sy High :
+The high watermark is unused for write operations.
+.It Sy Low :
+The user-defined write callback is invoked when the buffer is drained below
+the low watermark.
+.El
+.El
+.Sh SEE ALSO
+.Xr bufferevent_new 3 ,
+.Xr bufferevent_read 3
+.Sh HISTORY
+This functions first appeared in libevent-0.8 and has been available since
+.Ox 3.6 .
+.Sh AUTHORS
+This function was written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
