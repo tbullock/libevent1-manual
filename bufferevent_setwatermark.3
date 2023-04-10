@@ -18,7 +18,7 @@
 .Os
 .Sh NAME
 .Nm bufferevent_setwatermark
-.Nd one line about what it does
+.Nd configure I/O thresholds
 .Sh SYNOPSIS
 .In event.h
 .Ft void
@@ -35,7 +35,7 @@ The reaction to watermark levels is known as back pressure, meaning that the
 library schedules internal read and write operations based on watermark
 values.
 These determine when to read data from the assigned file descriptor and when
-to invoke user-defined callbacks if they exist.
+to invoke user-defined callbacks, if they exist.
 .Pp
 .Fn bufferevent_setwatermark
 configures the watermark values for the
@@ -43,7 +43,7 @@ configures the watermark values for the
 structure
 .Fa bufev .
 The bitmask
-.Fa events ,
+.Fa events
 specifies which operations the settings are applied to
 .Po
 .Dv EV_READ
