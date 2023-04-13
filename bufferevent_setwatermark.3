@@ -32,8 +32,7 @@
 A watermark is an optional user-defined threshold that guides the bufferevent
 API in managing the flow of data in and out of a buffer.
 The reaction to watermark levels is known as back pressure, meaning that the
-library schedules internal read and write operations based on watermark
-values.
+library schedules internal I/O operations based on watermark values.
 These determine when to read data from the assigned file descriptor and when
 to invoke user-defined callbacks, if they exist.
 .Pp
