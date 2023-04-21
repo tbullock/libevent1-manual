@@ -1,0 +1,60 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt BUFFEREVENT_SETFD 3
+.Os
+.Sh NAME
+.Nm bufferevent_setfd
+.Nd update bufferevent file descriptor
+.Sh SYNOPSIS
+.In event.h
+.Ft void
+.Fn bufferevent_setfd "struct bufferevent *bufev" "int fd"
+.Sh DESCRIPTION
+.Fn bufferevent_setfd
+is used to update the file descriptor
+.Fa fd
+associated with a
+.Vt bufferevent
+structure
+.Fa bufev.
+This function is helpful for reinitializing an existing
+.Vt bufferevent
+with a new file descriptor after closing a connection and opening a new one.
+Read and write events for the old file descriptor are deleted, and new events
+are configured.
+For details on rescheduling the
+.Vt bufferevent ,
+refer to
+.Xr bufferevent_enable 3.
+If
+.Fa bufev
+is
+.Dv NULL
+or not in an initialized state, the function causes undefined behavior.
+.Sh SEE ALSO
+.Xr bufferevent_new 3 ,
+.Xr bufferevent_enable 3
+.Sh HISTORY
+This function first appeared in libevent-0.8 and has been available since
+.Ox 3.6 .
+.Sh AUTHORS
+.Fn bufferevent_setfd was written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
