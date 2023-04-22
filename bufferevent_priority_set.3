@@ -1,0 +1,77 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt BUFFEREVENT_PRIORITY_SET 3
+.Os
+.Sh NAME
+.Nm bufferevent_priority_set
+.Nd configure bufferevent processing priority
+.Sh SYNOPSIS
+.In event.h
+.Ft int
+.Fn bufferevent_priority_set "struct bufferevent *bufev" "int priority"
+.Sh DESCRIPTION
+.Fn bufferevent_priority_set
+is used to set the priority of the read and write events associated with a
+.Vt bufferevent
+structure
+.Fa bufev .
+This allows programs to prioritize the processing of a
+.Vt bufferevent
+over other events, ensuring that more important tasks are processed first.
+The argument
+.Fa priority
+represents the queue number to be assigned to the read and write
+events associated with the
+.Vt bufferevent .
+.Pp
+Queue numbers are configured using
+.Xr event_base_priority_init 3 .
+An explanation of the event library priority system is detailed in that manual
+page.
+.Pp
+The function will fail if the
+.Fa priority
+argument is less than 0 or greater than or equal to the total number of active
+priority queues in the
+.Vt event_base
+structure.
+Additionally, it will fail if the event is already active.
+The function can be called when
+.Fa bufev
+is in the initialized or scheduled state, but not when it is in the activated
+state.
+The behavior is undefined if
+.Va bufev
+is
+.Dv NULL .
+.Sh RETURN VALUES
+.Fn bufferevent_priority_set
+returns the value 0 if successful; otherwise the value \-1 is returned.
+.Sh SEE ALSO
+.Xr bufferevent_new 3 ,
+.Xr event_base_priority_init 3 ,
+.Xr event_priority_set 3
+.Sh HISTORY
+This function first appeared in libevent-0.8 and has been available since
+.Ox 3.6 .
+.Sh AUTHORS
+This function was written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
