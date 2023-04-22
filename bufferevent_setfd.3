@@ -30,7 +30,7 @@ is used to update the file descriptor
 associated with a
 .Vt bufferevent
 structure
-.Fa bufev.
+.Fa bufev .
 This function is helpful for reinitializing an existing
 .Vt bufferevent
 with a new file descriptor after closing a connection and opening a new one.
@@ -39,20 +39,20 @@ are configured.
 For details on rescheduling the
 .Vt bufferevent ,
 refer to
-.Xr bufferevent_enable 3.
+.Xr bufferevent_enable 3 .
 If
 .Fa bufev
 is
 .Dv NULL
 or not in an initialized state, the function causes undefined behavior.
 .Sh SEE ALSO
-.Xr bufferevent_new 3 ,
-.Xr bufferevent_enable 3
+.Xr bufferevent_enable 3 ,
+.Xr bufferevent_new 3
 .Sh HISTORY
 This function first appeared in libevent-0.8 and has been available since
 .Ox 3.6 .
 .Sh AUTHORS
-.Fn bufferevent_setfd was written by
+This function was written by
 .An -nosplit
 .An Niels Provos .
 .Pp
