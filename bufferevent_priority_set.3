@@ -43,13 +43,13 @@ Queue numbers are configured using
 An explanation of the event library priority system is detailed in that manual
 page.
 .Pp
-The function will fail if the
+The function fails if the
 .Fa priority
 argument is less than 0 or greater than or equal to the total number of active
 priority queues in the
 .Vt event_base
 structure.
-Additionally, it will fail if the event is already active.
+Additionally, it fails if the event is already active.
 The function can be called when
 .Fa bufev
 is in the initialized or scheduled state, but not when it is in the activated
