@@ -20,9 +20,7 @@
 .Nm bufferevent_new ,
 .Nm bufferevent_free ,
 .Nm bufferevent_base_set ,
-.Nm bufferevent_setcb ,
-.Nm bufferevent_setfd ,
-.Nm bufferevent_priority_set
+.Nm bufferevent_setcb
 .Nd bufferevent configuration
 .Sh SYNOPSIS
 .In event.h
@@ -52,29 +50,16 @@
 .Fa "struct event_base *base"
 .Fa "struct bufferevent *bufev"
 .Fc
-.Ft void
-.Fo bufferevent_setcb
-.Fa "struct bufferevent *bufev"
-.Fa "evbuffercb readcb"
-.Fa "evbuffercb writecb"
-.Fa "everrorcb errorcb"
-.Fa "void *cbarg"
-.Fc
-.Ft void
-.Fn bufferevent_setfd "struct bufferevent *bufev" "int fd"
-.Ft int
-.Fn bufferevent_priority_set "struct bufferevent *bufev" "int priority"
 .Sh DESCRIPTION
 The
 .Sy bufferevent
-API is an abstraction built on top of the asynchronous event loop and
+API is an abstraction built on the event library's asynchronous event loop and
 .Sy evbuffer
-components of the event library, providing buffered I/O functionality.
-Designed to handle both reading and writing operations on a socket,
-the API automatically buffers the data to be sent or received.
-It integrates with an initialized
+components that provides buffered reading and writing operations on a socket.
+This API integrates with an event loop using an
 .Vt event_base
-structure and invokes optional user-defined callbacks for I/O events.
+structure and invokes optional user-defined callbacks for buffered I/O
+operations.
 .Pp
 For each socket or file descriptor being monitored, the API requires a new
 .Vt bufferevent
@@ -94,10 +79,7 @@ event states are categorized as
 .Sy scheduled
 or
 .Sy activated .
-The
-.Sy bufferevent
-API
-categorizes a
+The bufferevent API categorizes a
 .Vt bufferevent
 structure into these states as follows:
 .Bl -tag -width "Initialized:"
@@ -106,29 +88,63 @@ When a
 .Vt bufferevent
 structure is created using
 .Fn bufferevent_new ,
-the read and write events associated with the file descriptor are configured
-and not yet registered with an event loop.
-.Fn bufferevent_base_set
-can assign the structure to an
-.Vt event_base ,
-otherwise the API assumes the program was initialized using
-.Xr event_init 3 .
-.It Sy Scheduled :
-After initializing a
-.Vt bufferevent ,
-the structure is registered with an event loop using
+it is in the default initialized state.
+While in this state, the new structure can:
+.Bl -dash
+.It
+Be registered to a specific
+.Vt event_base
+using
+.Fn bufferevent_base_set .
+.It
+Be assigned a new file descriptor using
+.Xr bufferevent_setfd 3 .
+.It
+Be further configured using other
+.Em bufferevent_set*
+functions.
+.It
+Have data manually appended
+.Pq see Xr bufferevent_write 3 .
+.It
+Be manually drained of data
+.Pq see Xr bufferevent_read 3 .
+.It
+Be scheduled with the event loop for automatic I/O by using
 .Xr bufferevent_enable 3 .
-In this state, the events are idle, waiting for their respective triggers.
-The function
-.Xr bufferevent_write 3
-implicitly schedules write events.
+.It
+Be deallocated by
+.Fn bufferevent_free .
+.El
+.It Sy Scheduled :
+When a
+.Vt bufferevent
+is in the scheduled state, it is registered with an event loop and awaits
+event triggers.
+It stays scheduled until
+.Xr bufferevent_disable 3
+is called.
+The structure can:
+.Bl -dash
+.It
+Be actively monitored for read and write events by a running event loop.
+When these are triggered, the structure transitions to the activated state.
+.It
+Have data manually appended
+.Pq see Xr bufferevent_write 3 .
+.It
+Be manually drained of data
+.Pq see Xr bufferevent_read 3 .
+.It
+Unscheduled and transitioned back to the initialized state using
+.Xr bufferevent_disable 3 .
+.El
 .It Sy Activated :
-When the read or write events are triggered
-.Po
-due to data being available to read or buffer space being available to write
-.Pc , they become activated.
-The event loop processes these activated events, invoking the corresponding
-user-defined callbacks (read, write, or error) as necessary.
+When read or write events are triggered they become activated and the event
+loop processes them, invoking the corresponding user-defined callbacks
+.Pq read, write, or error
+as necessary.
+Afterward, the structure returns to the scheduled state.
 .El
 .Pp
 .Fn bufferevent_new
@@ -138,23 +154,21 @@ structure for I/O operations on a given file descriptor.
 The function arguments are specified as follows:
 .Bl -tag -width "writecb:"
 .It Fa fd :
-An open file descriptor
-.Pq typically a socket
-set to non-blocking mode
+An open file descriptor, typically a socket set to non-blocking mode
 .Dv O_NONBLOCK
-via
+with
 .Xr fcntl 2 .
 .It Fa readcb :
-.Vt evbuffercb
+.Fn evbuffercb
 callback for read events.
 .It Fa writecb :
-.Vt evbuffercb
+.Fn evbuffercb
 callback for write events.
 .It Fa errorcb :
-.Vt everrorcb
+.Fn everrorcb
 callback for error events.
 .It Fa cbarg :
-User-defined pointer that is passed to callback functions when triggered.
+User-defined pointer that is passed to callback functions when activated.
 .El
 .Pp
 The callback function type
@@ -176,7 +190,9 @@ and activated for error events, connection closures, and timeouts.
 The function parameter types include:
 .Bl -tag -width "8n"
 .It Fa struct bufferevent * :
-A pointer to the bufferevent structure associated with the file descriptor
+A pointer to the
+.Vt bufferevent
+structure associated with the file descriptor
 that triggered the event.
 .It Fa short :
 A bitmask of flags indicating the type of event that occurred,
@@ -214,30 +230,36 @@ assigns the
 .Vt bufferevent
 structure
 .Fa bufev
-to the initialized
+to the
 .Vt event_base
 structure
-.Fa base
-returned by
-.Xr event_base_new 3
-or
-.Xr event_init 3 .
-If this function is not invoked, the API assumes that the event library was
-initialized by
-.Xr event_init 3
-and relies on internal global library variables.
-All
-.Sy bufferevent
-functions except for
-.Fn bufferevent_new
-cause undefined behavior if invoked without initializing the library.
+.Fa base .
 If
 .Fa bufev
 or
 .Fa base
 is
+.Dv NULL ,
+the function causes undefined behavior.
+.Pp
+If this function is not invoked, the API assumes that the event library was
+initialized by
+.Xr event_init 3 .
+Programs using
+.Xr event_base_new 3
+associate the
+.Vt bufferevent
+with the appropriate
+.Vt event_base
+by calling
+.Fn bufferevent_base_set .
+All other bufferevent API functions, except for
+.Fn bufferevent_new ,
+cause a
 .Dv NULL
-the function causes a segmentation fault.
+pointer access if invoked without an initialized
+.Vt event_base
+structure.
 .Pp
 .Fn bufferevent_setcb
 is used to set or update the callback functions and the user-defined argument
@@ -253,51 +275,6 @@ and
 .Fa cbarg
 are equivalanet to arguments for
 .Fn bufferevent_new .
-.Pp
-.Fn bufferevent_setfd
-is used to update the file descriptor
-.Fa fd
-associated with a
-.Vt bufferevent
-structure
-.Fa bufev .
-This function is helpful for reinitializing an existing
-.Vt bufferevent
-with a new file descriptor after closing a connection and opening a new one.
-Read and write events are deleted for the old file descriptor and new events
-are configured.
-To re-schedule the
-.Vt bufferevent
-use
-.Xr bufferevent_enable 3 .
-If
-.Fa bufev
-is
-.Dv NULL
-the function causes undefined behavior.
-.Pp
-.Fn bufferevent_priority_set
-is used to set the priority of the read and write events associated with a
-.Vt bufferevent
-structure
-.Fa bufev .
-This allows programs to prioritize the processing of a
-.Vt bufferevent
-over other events, ensuring that more important events are processed first.
-The behavior is undefined if
-.Va bufev
-is
-.Dv NULL .
-The integer argument
-.Fa priority
-represents the queue number to be assigned to the read and write
-events associated with the
-.Vt bufferevent .
-.Pp
-Queue numbers are configured using
-.Xr event_base_priority_init 3 .
-An explanation of the event library priority system is detailed in that manual
-page.
 .Sh RETURN VALUES
 .Fn bufferevent_new
 returns a pointer to a
@@ -311,20 +288,13 @@ is preserved.
 .Fn bufferevent_base_set
 returns 0 if invoked while
 .Fa bufev
-is an
-.Sy initialized
-.Vt bufferevent
-structure; otherwise the value \-1 is returned.
-.Pp
-.Fn bufferevent_priority_set
-returns the value 0 if successful; otherwise the value \-1 is returned.
-.\" .Sh EXAMPLES
+is the initialized state; otherwise the value \-1 is returned.
 .Sh ERRORS
 On failure
 .Fn bufferevent_new
 preserves
 .Va errno
-values set equivalent to
+values equivalent to
 .Xr calloc 3
 or
 .Xr evbuffer_new 3 .
@@ -334,13 +304,13 @@ The remaining functions do not set
 upon failure.
 .Sh SEE ALSO
 .Xr bufferevent_enable 3 ,
+.Xr bufferevent_priority_set 3 ,
 .Xr bufferevent_read 3 ,
+.Xr bufferevent_setfd 3 ,
 .Xr bufferevent_settimeout 3 ,
 .Xr evbuffer_new 3 ,
 .Xr event_base_loop 3 ,
-.Xr event_base_new 3 ,
-.Xr event_base_priority_init 3 ,
-.Xr event_priority_set 3
+.Xr event_base_new 3
 .Sh HISTORY
 These functions first appeared in libevent-0.8 and have been available since
 .Ox 3.6 .
