@@ -31,9 +31,9 @@ associated with a
 .Vt bufferevent
 structure
 .Fa bufev .
-This function is helpful for reinitializing an existing
+This function reinitializes an existing
 .Vt bufferevent
-with a new file descriptor after closing a connection and opening a new one.
+with a new file descriptor.
 Read and write events for the old file descriptor are deleted, and new events
 are configured.
 For details on rescheduling the
