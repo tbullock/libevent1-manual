@@ -26,14 +26,14 @@
 .In event.h
 .Ft typedef void
 .Fo (*evbuffercb)
-.Fa "struct bufferevent *"
-.Fa "void *"
+.Fa "struct bufferevent *bufev"
+.Fa "void *cbarg"
 .Fc
 .Ft typedef void
 .Fo (*everrorcb)
-.Fa "struct bufferevent *"
-.Fa "short"
-.Fa "void *"
+.Fa "struct bufferevent *bufev"
+.Fa "short flags"
+.Fa "void *cbarg"
 .Fc
 .Ft struct bufferevent *
 .Fo bufferevent_new
@@ -49,6 +49,14 @@
 .Fo bufferevent_base_set
 .Fa "struct event_base *base"
 .Fa "struct bufferevent *bufev"
+.Fc
+.Ft void
+.Fo bufferevent_setcb
+.Fa "struct bufferevent *bufev"
+.Fa evbuffercb readcb
+.Fa evbuffercb writecb
+.Fa everrorcb errorcb
+.Fa "void *cbarg"
 .Fc
 .Sh DESCRIPTION
 The
@@ -82,8 +90,8 @@ or
 The bufferevent API categorizes a
 .Vt bufferevent
 structure into these states as follows:
-.Bl -tag -width "Initialized:"
-.It Sy Initialized :
+.Bl -tag -width "Initialized"
+.It Sy Initialized
 When a
 .Vt bufferevent
 structure is created using
@@ -116,19 +124,17 @@ Be scheduled with the event loop for automatic I/O by using
 Be deallocated by
 .Fn bufferevent_free .
 .El
-.It Sy Scheduled :
+.It Sy Scheduled
 When a
 .Vt bufferevent
-is in the scheduled state, it is registered with an event loop and awaits
-event triggers.
+is in the scheduled state, it is registered to an event loop with an
+.Vt event_base
+structure and awaits activation.
 It stays scheduled until
 .Xr bufferevent_disable 3
 is called.
 The structure can:
 .Bl -dash
-.It
-Be actively monitored for read and write events by a running event loop.
-When these are triggered, the structure transitions to the activated state.
 .It
 Have data manually appended
 .Pq see Xr bufferevent_write 3 .
@@ -139,7 +145,7 @@ Be manually drained of data
 Unscheduled and transitioned back to the initialized state using
 .Xr bufferevent_disable 3 .
 .El
-.It Sy Activated :
+.It Sy Activated
 When read or write events are triggered they become activated and the event
 loop processes them, invoking the corresponding user-defined callbacks
 .Pq read, write, or error
@@ -152,22 +158,22 @@ creates a
 .Vt bufferevent
 structure for I/O operations on a given file descriptor.
 The function arguments are specified as follows:
-.Bl -tag -width "writecb:"
-.It Fa fd :
+.Bl -tag -width "writecb"
+.It Fa fd
 An open file descriptor, typically a socket set to non-blocking mode
 .Dv O_NONBLOCK
 with
 .Xr fcntl 2 .
-.It Fa readcb :
+.It Fa readcb
 .Fn evbuffercb
 callback for read events.
-.It Fa writecb :
+.It Fa writecb
 .Fn evbuffercb
 callback for write events.
-.It Fa errorcb :
+.It Fa errorcb
 .Fn everrorcb
 callback for error events.
-.It Fa cbarg :
+.It Fa cbarg
 User-defined pointer that is passed to callback functions when activated.
 .El
 .Pp
@@ -187,14 +193,14 @@ user-defined pointer configured with
 is a user-defined error callback function supplied to
 .Fa errorcb
 and activated for error events, connection closures, and timeouts.
-The function parameter types include:
+The function parameters are:
 .Bl -tag -width "8n"
-.It Fa struct bufferevent * :
+.It Fa bufev
 A pointer to the
 .Vt bufferevent
 structure associated with the file descriptor
 that triggered the event.
-.It Fa short :
+.It Fa flags
 A bitmask of flags indicating the type of event that occurred,
 the possible values include:
 .Bl -tag -width "EVBUFFER_TIMEOUT" -compact
@@ -211,7 +217,7 @@ Signifies that an error occurred during a read or write operation.
 Represents that a timeout occurred while waiting for a read or write operation
 to complete.
 .El
-.It Fa "void *" :
+.It Fa cbarg
 User-defined pointer configured with
 .Fn bufferevent_new .
 .El
@@ -273,7 +279,7 @@ The function arguments
 .Fa errorcb
 and
 .Fa cbarg
-are equivalanet to arguments for
+are equivalent to arguments for
 .Fn bufferevent_new .
 .Sh RETURN VALUES
 .Fn bufferevent_new
