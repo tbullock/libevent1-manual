@@ -1,0 +1,131 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt BUFFEREVENT_ENABLE 3
+.Os
+.Sh NAME
+.Nm bufferevent_enable ,
+.Nm bufferevent_disable
+.Nd control bufferevent scheduling
+.Sh SYNOPSIS
+.In event.h
+.Ft int
+.Fn bufferevent_enable "struct bufferevent *bufev" "short event"
+.Ft int
+.Fn bufferevent_disable "struct bufferevent *bufev" "short event"
+.Sh DESCRIPTION
+These functions manage the state of a
+.Vt bufferevent
+structure
+.Fa bufev
+by controlling its transition between
+.Em initialized
+and
+.Em scheduled
+states.
+The
+.Fa event
+parameter decides the type of event operation to be scheduled or unscheduled,
+which can be
+.Dv EV_READ ,
+.Dv EV_WRITE ,
+or a combination of both
+.Pq Dv EV_READ & Dv EV_WRITE .
+Values of
+.Fa event
+other than these are undefined.
+If
+.Fa bufev
+is
+.Dv NULL
+the behavior is undefined.
+.Pp
+.Fn bufferevent_enable
+transitions
+.Fa bufev
+from an initialized state to a scheduled state.
+The function shares the same failure conditions as
+.Xr event_add 3 .
+.Pp
+Conversely,
+.Fn bufferevent_disable
+transitions
+.Fa bufev
+from a scheduled state back to an initialized state.
+The function shares the same failure conditions as
+.Xr event_del 3 .
+.Sh RETURN VALUES
+These functions return 0 on success or \-1 on failure.
+.Pp
+Some failure conditions do not return, refer to the
+.Xr event_add 3
+manual page for documentation on this behavior.
+.Sh ERRORS
+Although they do not set
+.Va errno
+directly on failure, these functions preserve
+.Va errno
+values set within internal calls to
+.Xr event_add 3
+and
+.Xr event_del 3
+respectively.
+.Sh SEE ALSO
+.Xr bufferevent_new 3 ,
+.Xr event_add 3 ,
+.Xr event_del 3
+.Sh HISTORY
+These functions first appeared in libevent-0.8 and have been available since
+.Ox 3.6 .
+.Sh AUTHORS
+.Fn bufferevent_enable
+and
+.Fn bufferevent_disable
+were written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh CAVEATS
+Although these functions inherit the rather complex failure conditions of
+.Xr event_add 3
+and
+.Xr event_del 3 ,
+this behavior is not part of the API contract and newer versions of libevent
+have different behavior.
+.Sh BUGS
+In cases where the function is called with
+.Ql EV_READ & EV_WRITE
+and one of the event scheduling operations fails, the functions return \-1,
+indicating an overall failure.
+However, one of the event operations may have been successfully scheduled or
+unscheduled, without providing an explicit indication to the caller.
+.Pp
+To ensure reliable error handling, it is recommended to separate the function
+calls for each event type.
+Instead of using
+.Ql EV_READ & EV_WRITE
+in a single function call, perform separate calls for
+.Dv EV_READ
+and
+.Dv EV_WRITE .
+.Pp
+For example:
+.Dl "bufferevent_enable(bufev, EV_READ);"
+.Dl "bufferevent_enable(bufev, EV_WRITE);"
+.Pp
+This allows the caller to handle the failure of each operation independently.
