@@ -1,0 +1,93 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt BUFFEREVENT_READ 3
+.Os
+.Sh NAME
+.Nm bufferevent_read
+.Nd Drain data from bufferevent
+.Sh SYNOPSIS
+.In event.h
+.Ft size_t
+.Fo bufferevent_read
+.Fa "struct bufferevent *bufev"
+.Fa "void *data"
+.Fa "size_t size"
+.Fc
+.Sh DESCRIPTION
+.Fn bufferevent_read
+moves data from the internal
+.Em input
+buffer of the given
+.Vt bufferevent
+structure into a user-defined data buffer.
+The function arguments are specified as follows:
+.Bl -tag -width Ds
+.It Fa bufev
+A pointer to a
+.Vt bufferevent
+structure from which data is to be read.
+The behavior is undefined if this is
+.Dv NULL .
+.It Fa data
+A user-defined pointer to the destination buffer where data will be moved.
+The behavior is undefined if this is
+.Dv NULL .
+.It Fa size
+The maximum number of bytes to be read into data.
+.El
+.Pp
+The
+.Fn bufferevent_read
+function is non-blocking, returning immediately with whatever data is
+available.
+.Pp
+The function is designed to operate on a
+.Vt bufferevent
+structure that is in the
+.Em activated
+state and be called from the
+.Va readcb
+callback configured with
+.Xr bufferevent_new 3 .
+Specifically, it retrieves data that has been read from the underlying
+transport
+.Pq such as a network socket
+as a result of an
+.Dv EV_READ
+event.
+.Sh RETURN VALUES
+The function returns the number of bytes that were actually read and copied
+into
+.Fa data .
+If there are fewer bytes available in the buffer than requested, the function
+returns only the available bytes.
+If no data is available, the function returns 0.
+.Sh SEE ALSO
+.Xr bufferevent_enable 3 ,
+.Xr bufferevent_new 3 ,
+.Xr bufferevent_write 3
+.Sh HISTORY
+.Fn bufferevent_read
+first appeared in libevent-0.8 and has been available since
+.Ox 3.6 .
+.Sh AUTHORS
+This function was written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
