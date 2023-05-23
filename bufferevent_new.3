@@ -104,15 +104,15 @@ disconnections.
 As discussed in
 .Xr event_base_loop 3 ,
 event states are categorized as
-.Sy initialized ,
-.Sy scheduled
+.Em initialized ,
+.Em scheduled
 or
-.Sy activated .
+.Em activated .
 The bufferevent API categorizes a
 .Vt bufferevent
 structure into these states as follows:
 .Bl -tag -width "Initialized"
-.It Sy Initialized
+.It Em Initialized
 When a
 .Vt bufferevent
 structure is created using
@@ -133,11 +133,14 @@ Be further configured using other
 .Em bufferevent_set*
 functions.
 .It
-Have data manually appended or drained; see
-.Xr bufferevent_write 3
-or
-.Xr bufferevent_read 3
-respectively.
+Have data manually appended using
+.Xr bufferevent_write 3 ,
+which may transition the write operations to the scheduled state if
+.Xr bufferevent_enable 3
+has been called for write events.
+.It
+Be manually drained of data using
+.Xr bufferevent_read 3 .
 .It
 Be scheduled with the event loop for automatic I/O by using
 .Xr bufferevent_enable 3 .
@@ -145,32 +148,51 @@ Be scheduled with the event loop for automatic I/O by using
 Be deallocated by
 .Fn bufferevent_free .
 .El
-.It Sy Scheduled
+.It Em Scheduled
 When a
 .Vt bufferevent
 is in the scheduled state, it is registered to an event loop with an
 .Vt event_base
-structure and awaits activation.
-It stays scheduled until
-.Xr bufferevent_disable 3
-is called.
+structure and awaits activation for read or write operations.
+It stays scheduled as long as there are enabled events
+.Pq read or write
+that are yet to be activated.
 The structure can:
 .Bl -dash
+.It
 Have data manually appended or drained; see
 .Xr bufferevent_write 3
 or
 .Xr bufferevent_read 3
 respectively.
 .It
-Unscheduled and transitioned back to the initialized state using
+Be unscheduled and transitioned back to the initialized state for specific
+events using
 .Xr bufferevent_disable 3 .
 .El
-.It Sy Activated
-When read or write events are triggered they become activated and the event
-loop processes them, invoking the corresponding user-defined callbacks
-.Pq read, write, or error
-as necessary.
-Afterward, the structure returns to the scheduled state.
+.It Em Activated
+When a
+.Vt bufferevent
+becomes activated, it means that a read or write event has been triggered.
+During this state, the read or write operations are performed as per the data
+in the input or output buffers.
+If there is incoming data on the file descriptor, it is read into the input
+buffer and the read callback, if set, is called.
+The
+.Vt bufferevent
+then returns to the scheduled state, ready for further reads.
+.Pp
+For write operations, data from the output buffer is written to the file
+descriptor and the write callback, if set, is called.
+If there is still data in the output buffer after the write operation, the
+.Vt bufferevent
+remains in the scheduled state for further write operations.
+However, if all data has been written
+.Pq the output buffer is empty ,
+it transitions back to the initialized state for write operations.
+.Pp
+Both read and write operations can be in different states independently,
+allowing for simultaneous reading and writing.
 .El
 .Pp
 .Fn bufferevent_new
