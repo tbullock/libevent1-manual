@@ -76,6 +76,27 @@ Each
 .Vt bufferevent
 maintains its own input and output buffers, as well as read, write, and error
 event callbacks.
+The input buffer is populated as a result of
+.Dv EV_READ
+operations, which are scheduled by
+.Xr bufferevent_enable 3 .
+Once data has been read into the input buffer, it can be retrieved by the
+calling program using
+.Xr bufferevent_read 3 .
+.Pp
+Conversely, the output buffer holds data that is to be written to the
+associated file descriptor.
+.Xr bufferevent_write 3
+is used to add this data to the output buffer.
+Once an
+.Dv EV_WRITE
+operation is scheduled using
+.Xr bufferevent_enable 3
+and activated by the event loop, the stored data is moved from the
+output buffer to its destination.
+This effectively drains the output buffer, preparing it for further data to be
+written.
+.Pp
 It is advised for calling programs to define at least the read and error
 callbacks to properly handle incoming data and react to errors or
 disconnections.
