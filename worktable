@@ -75,12 +75,12 @@ Ted: TTD; has internal list of things to adjust
 | evtimer_initialized            | Yes | event_pending.3            | No   |      |       | OK   | RDY |                                         |
 |--------------------------------|-----|----------------------------|------|------|-------|------|-----|-----------------------------------------|
 | bufferevent_base_set           | Yes | bufferevent_new.3          | No   |      | RA    | RA   | RDY |                                         |
-| bufferevent_disable            | Yes | bufferevent_enable.3       | No   |      |       |      |     |                                         |
-| bufferevent_enable             | Yes | bufferevent_enable.3       | No   |      |       |      |     |                                         |
+| bufferevent_disable            | Yes | bufferevent_enable.3       | No   |      |       | OK   | RDY |                                         |
+| bufferevent_enable             | Yes | bufferevent_enable.3       | No   |      |       | OK   | RDY |                                         |
 | bufferevent_free               | Yes | bufferevent_new.3          | No   |      | RA    | RA   | RDY |                                         |
 | bufferevent_new                | Yes | bufferevent_new.3          | No   |      | RA    | RA   | RDY | Double check niels wrote all these      |
 | bufferevent_priority_set       | Yes | bufferevent_priority_set.3 | No   |      | OK    | OK   | RDY |                                         |
-| bufferevent_read               | Yes |                            | No   |      |       |      |     |                                         |
+| bufferevent_read               | Yes | bufferevent_read.3         | No   |      |       |      |     |                                         |
 | bufferevent_read_pressure_cb   | Yes |                            | No   |      |       |      |     | Nicholas advises not documenting        |
 | bufferevent_setcb              | Yes | bufferevent_new.3          | No   |      |       |      |     |                                         |
 | bufferevent_setfd              | Yes | bufferevent_setfd.3        | No   |      | OK    | OK   | RDY |                                         |
