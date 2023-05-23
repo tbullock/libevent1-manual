@@ -133,11 +133,11 @@ Be further configured using other
 .Em bufferevent_set*
 functions.
 .It
-Have data manually appended
-.Pq see Xr bufferevent_write 3 .
-.It
-Be manually drained of data
-.Pq see Xr bufferevent_read 3 .
+Have data manually appended or drained; see
+.Xr bufferevent_write 3
+or
+.Xr bufferevent_read 3
+respectively.
 .It
 Be scheduled with the event loop for automatic I/O by using
 .Xr bufferevent_enable 3 .
@@ -156,12 +156,11 @@ It stays scheduled until
 is called.
 The structure can:
 .Bl -dash
-.It
-Have data manually appended
-.Pq see Xr bufferevent_write 3 .
-.It
-Be manually drained of data
-.Pq see Xr bufferevent_read 3 .
+Have data manually appended or drained; see
+.Xr bufferevent_write 3
+or
+.Xr bufferevent_read 3
+respectively.
 .It
 Unscheduled and transitioned back to the initialized state using
 .Xr bufferevent_disable 3 .
