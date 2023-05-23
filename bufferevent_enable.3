@@ -35,7 +35,7 @@ by controlling its transition between
 .Em initialized
 and
 .Em scheduled
-states.
+states for either read or write operations independently.
 The
 .Fa event
 parameter decides the type of event operation to be scheduled or unscheduled,
@@ -101,7 +101,7 @@ were written by
 This manual page was written by
 .An Ted Bullock Aq Mt tbullock@comlore.com .
 .Sh CAVEATS
-Although these functions inherit the rather complex failure conditions of
+Although these functions inherit the failure conditions of
 .Xr event_add 3
 and
 .Xr event_del 3 ,
