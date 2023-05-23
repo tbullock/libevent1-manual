@@ -43,7 +43,7 @@ which can be
 .Dv EV_READ ,
 .Dv EV_WRITE ,
 or a combination of both
-.Pq Dv EV_READ & Dv EV_WRITE .
+.Pq Dv EV_READ | Dv EV_WRITE .
 Values of
 .Fa event
 other than these are undefined.
@@ -109,7 +109,7 @@ this behavior is not part of the API contract and newer versions of libevent
 have different behavior.
 .Sh BUGS
 In cases where the function is called with
-.Ql EV_READ & EV_WRITE
+.Ql EV_READ | EV_WRITE
 and one of the event scheduling operations fails, the functions return \-1,
 indicating an overall failure.
 However, one of the event operations may have been successfully scheduled or
@@ -118,7 +118,7 @@ unscheduled, without providing an explicit indication to the caller.
 To ensure reliable error handling, it is recommended to separate the function
 calls for each event type.
 Instead of using
-.Ql EV_READ & EV_WRITE
+.Ql EV_READ | EV_WRITE
 in a single function call, perform separate calls for
 .Dv EV_READ
 and
