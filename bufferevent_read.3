@@ -55,11 +55,13 @@ The
 function is non-blocking, returning immediately with whatever data is
 available.
 .Pp
-The function is designed to operate on a
+The function can operate on a
 .Vt bufferevent
-structure that is in the
+structure from any state, however it is typically used when the
+.Vt bufferevent
+is in the
 .Em activated
-state and be called from the
+state and is called from the
 .Va readcb
 callback configured with
 .Xr bufferevent_new 3 .
