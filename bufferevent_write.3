@@ -1,0 +1,167 @@
+.\" $OpenBSD$
+.\" Copyright (c) 2023 Ted Bullock <tbullock@comlore.com>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+.\" ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+.\" OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt BUFFEREVENT_WRITE 3
+.Os
+.Sh NAME
+.Nm bufferevent_write ,
+.Nm bufferevent_write_buffer
+.Nd append data for writing
+.Sh SYNOPSIS
+.In event.h
+.Ft int
+.Fo bufferevent_write
+.Fa "struct bufferevent *bufev"
+.Fa "const void *data"
+.Fa "size_t size"
+.Fc
+.Ft int
+.Fo bufferevent_write_buffer
+.Fa "struct bufferevent *bufev"
+.Fa "struct evbuffer *buf"
+.Fc
+.Sh DESCRIPTION
+.Fn bufferevent_write
+appends data from a user-defined pointer to the output buffer of the given
+.Vt bufferevent
+structure, and if the structure is configured for writing by
+.Xr bufferevent_enable 3 ,
+schedules the data to be written to the associated file descriptor.
+The function arguments are as follows:
+.Bl -tag -width Ds
+.It Fa bufev
+A pointer to a
+.Vt bufferevent
+structure to which data is to be written.
+The behavior is undefined if this is
+.Dv NULL .
+.It Fa data
+A user-defined pointer to the source buffer where data is copied from.
+The behavior is undefined if this is
+.Dv NULL .
+.It Fa size
+The number of bytes to be written.
+.El
+.Pp
+.Fn bufferevent_write_buffer
+functions similarly to
+.Fn bufferevent_write ,
+except it takes an
+.Vt evbuffer
+structure
+.Fa buf
+as its source of data.
+It drains all the data from
+.Fa buf
+after copying it to the output buffer of
+.Fa bufev .
+.Pp
+If the output buffer is not fully drained after being activated, the
+.Vt bufferevent
+returns to the scheduled state for further write operations.
+.Pp
+These functions do not block; they merely copy buffers and schedule the write
+operation.
+If it is necessary to know when the data is actually written to the file
+descriptor, a write callback can be set using
+.Xr bufferevent_setcb 3 ,
+which is invoked when the output buffer is drained.
+.Pp
+Although these functions can technically be used regardless of the state of
+.Fa bufev ,
+they can only safely be called from the initialized write state
+.Pq See Sx BUGS .
+.Sh RETURN VALUES
+Both
+.Fn bufferevent_write
+and
+.Fn bufferevent_write_buffer
+return 0 on success and \-1 is returned on failure.
+.Pp
+These functions may not always accurately represent the success of the
+operation due to their internal use of
+.Xr event_add 3 .
+In certain scenarios where
+.Xr event_add 3
+fails, these functions may still return 0, suggesting success, or they might
+not return at all.
+.Sh ERRORS
+The error conditions for
+.Fn bufferevent_write
+and
+.Fn bufferevent_write_buffer
+and any
+.Va errno
+value are inherited from
+.Xr evbuffer_add 3 .
+.Pp
+Additionally, if these functions are already enabled for writing, they also
+inherit the error conditions and
+.Va errno
+values of
+.Xr event_add 3 .
+However, these functions will report success (return 0) even if
+.Xr event_add 3
+fails, unless
+.Xr event_add 3
+calls
+.Xr exit 3 ,
+in which case they do not return.
+.Sh SEE ALSO
+.Xr bufferevent_enable 3 ,
+.Xr bufferevent_new 3 ,
+.Xr bufferevent_read 3 ,
+.Xr evbuffer_add 3 ,
+.Xr event_add 3
+.Sh HISTORY
+These functions first appeared in libevent-0.8 and have been available since
+.Ox 3.6 .
+.Sh AUTHORS
+These functions were written by
+.An -nosplit
+.An Niels Provos .
+.Pp
+This manual page was written by
+.An Ted Bullock Aq Mt tbullock@comlore.com .
+.Sh BUGS
+These functions do not provide a mechanism indicating whether an internal call
+to schedule a write operation succeeded or failed.
+Moreover, even if they could, the function does not provide a mechanism to
+disambiguate a failure in appending data to the output buffer.
+.Pp
+To ensure safe usage, consider the following steps as a workaround:
+.Bl -enum
+.It
+Disable writing using
+.Xr bufferevent_disable 3 .
+.It
+Call
+.Fn bufferevent_write .
+This will append data to the output buffer, but it will not schedule a write
+operation because writing is disabled.
+.It
+Enable writing using
+.Xr bufferevent_enable 3 .
+This function attempts to schedule a write operation if data is present in the
+output buffer and returns \-1 on failure, providing a means of detecting a
+scheduling failure.
+.El
+.Pp
+These steps should prevent a situation where either
+.Fn bufferevent_write
+or
+.Fn bufferevent_write_buffer
+silently fail to schedule a write operation.
