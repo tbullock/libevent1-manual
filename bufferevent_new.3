@@ -160,11 +160,8 @@ that are yet to be activated.
 The structure can:
 .Bl -dash
 .It
-Have data manually appended or drained; see
-.Xr bufferevent_write 3
-or
-.Xr bufferevent_read 3
-respectively.
+Have data manually drained; see
+.Xr bufferevent_read 3 .
 .It
 Be unscheduled and transitioned back to the initialized state for specific
 events using
