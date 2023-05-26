@@ -37,7 +37,7 @@
 .Fn bufferevent_write
 appends data from a user-defined pointer to the output buffer of the given
 .Vt bufferevent
-structure, and if the structure is configured for writing by
+structure and, if the structure is configured for writing by
 .Xr bufferevent_enable 3 ,
 schedules the data to be written to the associated file descriptor.
 The function arguments are as follows:
@@ -83,7 +83,7 @@ which is invoked when the output buffer is drained.
 Although these functions can technically be used regardless of the state of
 .Fa bufev ,
 they can only safely be called from the initialized write state
-.Pq See Sx BUGS .
+.Pq see Sx BUGS .
 .Sh RETURN VALUES
 Both
 .Fn bufferevent_write
